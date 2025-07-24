@@ -8,7 +8,10 @@
 
   <!-- Ionicons -->
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  
+  
   <!--Fonts gg-->
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
@@ -17,10 +20,11 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="/mainfont/main.css" />
-  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="/mainfont/main.css" />
+  <link rel="stylesheet" href="thanhtoan.css" />
 </head>
 <body>
-  <nav class="navigation" id="main-nav"> <!--Thanh NAV-->
+  <nav class="navigation" id="main-nav">
     <div class="nav-wrapper">
       <!--Icon Bên trái -->
       <ul class="nav-left">
@@ -59,7 +63,8 @@
               <a href="/dangky_dangnhap/dangky.html">Đăng Ký</a>
         </div>
       </ul>
- <div class="green-bar"></div>
+      <div class="green-bar"></div>
+
       <!-- Ảnh logo ở giữa -->
       <div class="nav-logo">
         <a href="/trangchu/index.html">
@@ -70,10 +75,10 @@
       <!--Icon Bên phải -->
       <ul class="nav-right">
         <li class="list right-action">
-          <a href="/giohang/giohang.html" id="cart-toggle">
+          <a href="/giohang/giohang.html">
             <span class="icon"><ion-icon name="cart-outline"></ion-icon></span>
             <span class="text">Giỏ Hàng</span>
-          </a> 
+          </a>
         </li>
          <li class="list right-action">
   <div class="login-container">
@@ -94,78 +99,18 @@
   </nav>
   <!-- JS -->
   <script defer src="/mainfont/main.js"></script>
-<!--Phần code của từng trang-->
-<div class="slider">
-  <div class="slides">
-    <div class="slider-arrow prev"><ion-icon name="arrow-back-circle-outline"></ion-icon></div>
-    <div class="slider-arrow next"><ion-icon name="arrow-forward-circle-outline"></ion-icon></div>
-    <a href ="/gioithieu/gioithieu.html">
-      <img src="/images/trangchu/TERRAIUM (1).png" alt="Ảnh 1" />
-    </a>
-    <a href ="/sanpham/sanpham.html">
-      <img src="/images/trangchu/TERRAIUM2.png" alt="Ảnh 2" />
-    </a>
-    <a href="/tintuc/tintuc.html">
-      <img src="/images/trangchu/TERRAIUM3.png" alt="Ảnh 3" />
-    </a>
-    <a href="/tintuc/tintuc.html">
-      <img src="/images/trangchu/Terrarium – nghệ thuật xanh xóa nhòa khoảng cách thế hệ, kết nối mọi lứa tuổi bằng tình yêu thiên nhiên..png" alt="Ảnh 4" />
-    </a>
-    <a href="/huongdan/huongdan.html">
-      <img src="/images/trangchu/TERRAIUM 5.png" alt="Ảnh 5" />
-    </a>
-    <a href="/gioithieu/taisaochon.html">
-      <img src="/images/trangchu/Terrarium – chill có gu, sống có chất..png" alt="Ảnh 6" />
-    </a>
-  </div>
-</div>
-<!--Thêm dấu chấm điều hướng (dots navigation)-->
-<div class="dots">
-  <span class="dot active"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-</div>
-<!-- JS -->
-<script defer src="index.js"></script>
 
-<div class="sanpham-noibat">
-  <h2>SẢN PHẨM NỔI BẬT</h2>
-  <div class="product-grid">
-    <div class="product-card">
-      <a href="/sanpham/spchitiet.html?id=1">
-      <img src="/sanpham/image_sanpham/Bình trứng Mini/1.jpg" alt="Sản phẩm 1" />
-       </a>
-      <h3>Terrarium bình trứng Mini</h3>
-      <p>157.000đ</p>
-     
+  <!--Phần code của từng trang-->
+   <div class="success-box">
+    <div class="success-icon">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
     </div>
-    <div class="product-card">
-      <a href="/sanpham/spchitiet.html?id=2">
-      <img src="/sanpham/image_sanpham/Terrarium bình trụ 14x9 (2)/2.jpg" alt="Sản phẩm 2" />
-      </a>
-      <h3>Terrarium bình trụ 14x9</h3>
-      <p>357.000đ</p>
-    </div>
-    <div class="product-card">
-      <a href="/sanpham/spchitiet.html?id=3">
-      <img src="/sanpham/image_sanpham/Bình Mini Cube 12x12/1.jpg" alt="Sản phẩm 3" />
-      </a>
-      <h3>Bình Mini Cube 12x12</h3>
-      <p>599.000đ</p>
-    </div>
-    <div class="product-card">
-      <a href="/sanpham/spchitiet.html?id=4">
-      <img src="/sanpham/image_sanpham/Terrarium Đa Giác 16x16x32/1.jpg" alt="Sản phẩm 4" />
-      </a>
-      <h3>Terrarium Đa Giác 16x16x32</h3>
-      <p>957.000đ</p>
-    </div>
+    <div class="success-message">Thanh toán thành công!</div>
+    <div class="total-amount">Tổng tiền: <span id="total-amount">0đ</span></div>
+    <a href="/trangchu/index.html" class="home-link">Quay về Trang Chủ</a>
   </div>
-</div>
 
+  <script src="thanhtoan.js"></script>
 </body>
 
 <!--Footer-->

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,11 +17,15 @@
 
 
   <!-- CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="/mainfont/main.css" />
-  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="tintuc.css">
 </head>
+
 <body>
-  <nav class="navigation" id="main-nav"> <!--Thanh NAV-->
+<nav class="navigation" id="main-nav">
     <div class="nav-wrapper">
       <!--Icon Bên trái -->
       <ul class="nav-left">
@@ -59,7 +64,8 @@
               <a href="/dangky_dangnhap/dangky.html">Đăng Ký</a>
         </div>
       </ul>
- <div class="green-bar"></div>
+      <div class="green-bar"></div>
+
       <!-- Ảnh logo ở giữa -->
       <div class="nav-logo">
         <a href="/trangchu/index.html">
@@ -70,10 +76,10 @@
       <!--Icon Bên phải -->
       <ul class="nav-right">
         <li class="list right-action">
-          <a href="/giohang/giohang.html" id="cart-toggle">
+          <a href="/giohang/giohang.html">
             <span class="icon"><ion-icon name="cart-outline"></ion-icon></span>
             <span class="text">Giỏ Hàng</span>
-          </a> 
+          </a>
         </li>
          <li class="list right-action">
   <div class="login-container">
@@ -94,84 +100,42 @@
   </nav>
   <!-- JS -->
   <script defer src="/mainfont/main.js"></script>
-<!--Phần code của từng trang-->
-<div class="slider">
-  <div class="slides">
-    <div class="slider-arrow prev"><ion-icon name="arrow-back-circle-outline"></ion-icon></div>
-    <div class="slider-arrow next"><ion-icon name="arrow-forward-circle-outline"></ion-icon></div>
-    <a href ="/gioithieu/gioithieu.html">
-      <img src="/images/trangchu/TERRAIUM (1).png" alt="Ảnh 1" />
-    </a>
-    <a href ="/sanpham/sanpham.html">
-      <img src="/images/trangchu/TERRAIUM2.png" alt="Ảnh 2" />
-    </a>
-    <a href="/tintuc/tintuc.html">
-      <img src="/images/trangchu/TERRAIUM3.png" alt="Ảnh 3" />
-    </a>
-    <a href="/tintuc/tintuc.html">
-      <img src="/images/trangchu/Terrarium – nghệ thuật xanh xóa nhòa khoảng cách thế hệ, kết nối mọi lứa tuổi bằng tình yêu thiên nhiên..png" alt="Ảnh 4" />
-    </a>
-    <a href="/huongdan/huongdan.html">
-      <img src="/images/trangchu/TERRAIUM 5.png" alt="Ảnh 5" />
-    </a>
-    <a href="/gioithieu/taisaochon.html">
-      <img src="/images/trangchu/Terrarium – chill có gu, sống có chất..png" alt="Ảnh 6" />
-    </a>
-  </div>
-</div>
-<!--Thêm dấu chấm điều hướng (dots navigation)-->
-<div class="dots">
-  <span class="dot active"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-  <span class="dot"></span>
-</div>
-<!-- JS -->
-<script defer src="index.js"></script>
 
-<div class="sanpham-noibat">
-  <h2>SẢN PHẨM NỔI BẬT</h2>
-  <div class="product-grid">
-    <div class="product-card">
-      <a href="/sanpham/spchitiet.html?id=1">
-      <img src="/sanpham/image_sanpham/Bình trứng Mini/1.jpg" alt="Sản phẩm 1" />
-       </a>
-      <h3>Terrarium bình trứng Mini</h3>
-      <p>157.000đ</p>
-     
+  <!--Phần code của từng trang-->
+  
+  <div class="page" id="page--get">
+    <p class="danhmuctintuc">Danh mục tin tức</p>
+    <button id="open" onclick="displayYeuthich()"><i class="fa-solid fa-bars"></i> Yêu thích</button>
+    <div id="notification__delete"></div>
+    <div id="yeuthich" class="danhmucyeuthich">
+      <button id="deletes" title="Xóa tẩt cả các thẻ yêu thích" onclick="noitifi()"><i class="fa-solid fa-delete-left"></i></button>
+      <button id="close"><i class="fa-solid fa-backward-step"></i></button>
+      <div id="content_of_sidebar"></div>
+      <span id="box--sum">
+        <span>Tổng số bài viết yêu thích: </span> 
+        
+        <span id="sum"></span>
+      </span>
     </div>
-    <div class="product-card">
-      <a href="/sanpham/spchitiet.html?id=2">
-      <img src="/sanpham/image_sanpham/Terrarium bình trụ 14x9 (2)/2.jpg" alt="Sản phẩm 2" />
-      </a>
-      <h3>Terrarium bình trụ 14x9</h3>
-      <p>357.000đ</p>
-    </div>
-    <div class="product-card">
-      <a href="/sanpham/spchitiet.html?id=3">
-      <img src="/sanpham/image_sanpham/Bình Mini Cube 12x12/1.jpg" alt="Sản phẩm 3" />
-      </a>
-      <h3>Bình Mini Cube 12x12</h3>
-      <p>599.000đ</p>
-    </div>
-    <div class="product-card">
-      <a href="/sanpham/spchitiet.html?id=4">
-      <img src="/sanpham/image_sanpham/Terrarium Đa Giác 16x16x32/1.jpg" alt="Sản phẩm 4" />
-      </a>
-      <h3>Terrarium Đa Giác 16x16x32</h3>
-      <p>957.000đ</p>
+    <input type="text" id="search" placeholder="       search" title="Press Enter to search"> <button onclick="getValue()" class="buton">Tìm
+      Kiếm</button>
+    <div class="tintuc">
+      <div class="flex__container">
+        <div id="tintuc__list"></div>
+        <div class="tintuc__docnhieu hidden__mobile">
+          <p class="danhmuctintuc">Top đọc nhiều / Lượt xem</p>
+          <dic id="content__docnhieu"></div>
+      </div>
     </div>
   </div>
-</div>
-
+  
+  <script src="tintuc.js"></script>
 </body>
 
 <!--Footer-->
-<footer class="site-footer">
+<footer class="site-footer hidden__mobile">
   <div class="footer-container">
-    
+
     <!-- Cột 1: Giới thiệu -->
     <div class="footer-column">
       <h3>Về Chúng Tôi</h3>
@@ -198,16 +162,20 @@
       <p><ion-icon name="call-outline"></ion-icon> 083 977 8271</p>
       <p><ion-icon name="mail-outline"></ion-icon> thuanphatggarden@gmail.com</p>
       <p><ion-icon name="location-outline"></ion-icon> Quán nước HOA YÊN, 131 đường Lý Tự Trọng, Cần Thơ.</p>
-      <p><ion-icon name="location-outline"></ion-icon>  Ngọc Trương Coffee, 372B Đ. Nguyễn Văn Cừ, Phường An Khánh, Ninh Kiều, Cần Thơ.</p>
-      <p><ion-icon name="location-outline"></ion-icon> Tổ Của Yến Coffee, số 13, đường Trần Ngọc Quế, P Xuân Khánh, Q Ninh Kiều, TP Cần Thơ.</p>
+      <p><ion-icon name="location-outline"></ion-icon> Ngọc Trương Coffee, 372B Đ. Nguyễn Văn Cừ, Phường An Khánh, Ninh
+        Kiều, Cần Thơ.</p>
+      <p><ion-icon name="location-outline"></ion-icon> Tổ Của Yến Coffee, số 13, đường Trần Ngọc Quế, P Xuân Khánh, Q
+        Ninh Kiều, TP Cần Thơ.</p>
     </div>
 
     <!-- Cột 4: Mạng xã hội -->
     <div class="footer-column">
       <h3>Theo Dõi Chúng Tôi</h3>
       <div class="social-icons">
-        <a href="https://www.facebook.com/thuanphatggarden" target="_blank"><ion-icon name="logo-facebook"></ion-icon></a>
-        <a href="https://www.youtube.com/@anhshopcantho/featured" target="_blank"><ion-icon name="logo-youtube"></ion-icon></a>
+        <a href="https://www.facebook.com/thuanphatggarden" target="_blank"><ion-icon
+            name="logo-facebook"></ion-icon></a>
+        <a href="https://www.youtube.com/@anhshopcantho/featured" target="_blank"><ion-icon
+            name="logo-youtube"></ion-icon></a>
       </div>
     </div>
   </div>
@@ -217,4 +185,5 @@
   </div>
 
 </footer>
+
 </html>
