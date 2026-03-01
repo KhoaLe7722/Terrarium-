@@ -21,7 +21,7 @@ if (cart.length === 0) {
     <div class="empty-message" style="font-size: 24px; color: #555; margin-top: 10px;">
       Giỏ hàng của bạn đang trống!
     </div>
-    <a href="/sanpham/sanpham.html" class="home-link">Mua sản phẩm ngay</a>
+    <a href="../sanpham/sanpham.html" class="home-link">Mua sản phẩm ngay</a>
   `;
 } else {
   // Nếu có sản phẩm thì hiển thị thông báo thành công

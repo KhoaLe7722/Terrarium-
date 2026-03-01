@@ -152,14 +152,16 @@
 .filter-item label:hover {
   color: #54794a;
 }
+
 /* Breadcrump */
 /* === BREADCRUMB === */
 .bread-crumb {
   background-color: #f8f8f8;
   padding: 40px 0 24px;
-  margin-top: 80px;
+  margin-top: 10px;
   font-family: 'Dosis', sans-serif;
-  text-align: center; /* Canh giữa toàn bộ nội dung */
+  text-align: center;
+  /* Canh giữa toàn bộ nội dung */
 }
 
 .nd-main-title-breadcrumb {
@@ -213,8 +215,8 @@
 
 .page-header {
   text-align: center;
-  margin-bottom: 30px; 
-  margin-top: 120px;
+  margin-bottom: 30px;
+  margin-top: 10px;
 }
 
 .page-header h1 {
@@ -236,12 +238,14 @@
 .breadcrumb a:hover {
   text-decoration: underline;
 }
+
 /* ==== RESPONSIVE ==== */
 
 @media screen and (max-width: 1024px) {
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+
   .grid-layout {
     grid-template-columns: 1fr;
   }

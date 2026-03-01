@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,124 +17,51 @@
 
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/mainfont/main.css" />
-  <link rel="stylesheet" href="/giohang/giohangchitiet.css">
+  <link rel="stylesheet" href="../mainfont/main.css" />
+  <link rel="stylesheet" href="giohangchitiet.css">
 </head>
-<body>
-  <nav class="navigation" id="main-nav"> <!--Thanh NAV-->
-    <div class="nav-wrapper">
-      <!--Icon Bên trái -->
-      <ul class="nav-left">
-        <li class="list active">
-          <a href="/trangchu/index.html">
-            <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
-            <span class="text">Trang Chủ</span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="/sanpham/sanpham.html">
-            <span class="icon"><ion-icon name="leaf-outline"></ion-icon></span>
-            <span class="text">Sản Phẩm</span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="/gioithieu/gioithieu.html">
-            <span class="icon"><ion-icon name="information-circle-outline"></ion-icon></span>
-            <span class="text">Giới Thiệu</span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="/tintuc/tintuc.html">
-            <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
-            <span class="text">Tin Tức</span>
-          </a>
-        </li>
-        <li class="list">
-          <a href="/huongdan/huongdan.html">
-            <span class="icon"><ion-icon name="book-outline"></ion-icon></span>
-            <span class="text">Hướng Dẫn</span>
-          </a>
-        </li>
-        <div class="login-dropdown" id="login-dropdown">
-              <a href="/dangky_dangnhap/dangnhap.html">Đăng Nhập</a>
-              <a href="/dangky_dangnhap/dangky.html">Đăng Ký</a>
-        </div>
-      </ul>
- <div class="green-bar"></div>
-      <!-- Ảnh logo ở giữa -->
-      <div class="nav-logo">
-        <a href="/trangchu/index.html">
-        <img src="../images/Head.jpg" alt="Logo" />
-        </a>
-      </div>
 
-      <!--Icon Bên phải -->
-      <ul class="nav-right">
-        <li class="list right-action">
-          <a href="/giohang/giohang.html">
-            <span class="icon"><ion-icon name="cart-outline"></ion-icon></span>
-            <span class="text">Giỏ Hàng</span>
-          </a> 
-        </li>
-         <li class="list right-action">
-  <div class="login-container">
-    <div class="login-trigger">
-      <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
-      <span class="text">Đăng Nhập</span>
-    </div>
-    <div class="login-dropdown" id="login-dropdown">
-      <a href="/dangky_dangnhap/dangnhap.html">Đăng Nhập</a>
-      <a href="/dangky_dangnhap/dangky.html">Đăng Ký</a>
-    </div>
-  </div>
-</li>
-      </ul>
-
-    <!-- Thanh chỉ mục -->
-    <div class="indicator"></div>
-  </nav>
+<body data-page="cart">
+  <nav class="navigation" id="main-nav"></nav>
   <!-- JS -->
-  <script defer src="/mainfont/main.js"></script>
-
+  <script defer src="../mainfont/layout.js"></script>
+  <script defer src="../mainfont/main.js"></script>
 
   <!--Phần code của từng trang-->
-        
-      <div class="cart-popup" id="cart-popup">
-      <h3>Giỏ hàng của bạn</h3>
+
+  <div class="cart-popup" id="cart-popup">
+    <h3>Giỏ hàng của bạn</h3>
 
 
-      <table class = "cart-table">
-        <thead>
-            <tr>
-                <th>Thông tin sản phẩm</th>
-                <th>Đơn giá</th>
-                <th>Số lượng</th>
-                <th>Thành tiền</th>
-            </tr>
-        </thead>
-        <tbody id = "cart-items">
+    <table class="cart-table">
+      <thead>
+        <tr>
+          <th>Thông tin sản phẩm</th>
+          <th>Đơn giá</th>
+          <th>Số lượng</th>
+          <th>Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody id="cart-items">
 
-        </tbody>
-      </table>
+      </tbody>
+    </table>
 
 
 
-      <div class="cart-total">
-        Tổng tiền: <span id="cart-total">0đ</span>
-      </div>
-      <div class="cart-actions">
-        <a href="/thanhtoan/thanhtoan.html">
-        <button class = "checkout-btn">Thanh Toán</button>
-        </a>
-      </div>
+    <div class="cart-total">
+      Tổng tiền: <span id="cart-total">0đ</span>
     </div>
+    <div class="cart-actions">
+      <a href="../thanhtoan/thanhtoan.html">
+        <button class="checkout-btn">Thanh Toán</button>
+      </a>
+    </div>
+  </div>
 
-<script defer src="/giohang/giohang.js"></script>
+  <script defer src="giohang.js"></script>
 
-
-
-  
-
+  <footer class="site-footer" id="site-footer"></footer>
 </body>
 
 
