@@ -561,10 +561,23 @@ body>*:not(.navigation):not(script):not(footer) {
     height: 50px;
   }
 
-  /* Login dropdown cho mobile */
+  /* Login trigger - đảm bảo tap được trên màn hình nhỏ */
+  .login-trigger {
+    padding: 6px 4px;
+    min-width: 36px;
+    min-height: 36px;
+    justify-content: center;
+  }
+
+  /* Login dropdown cho mobile nhỏ - dùng fixed để tránh bị clip */
   .login-dropdown {
-    right: -50px;
-    min-width: 120px;
+    position: fixed;
+    top: 72px;
+    right: 10px;
+    left: auto;
+    min-width: 150px;
+    max-width: calc(100vw - 20px);
+    margin-top: 0;
   }
 
   /* Footer responsive mobile */

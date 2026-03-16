@@ -168,6 +168,7 @@
   overflow: hidden;
   /* Ngăn ảnh tràn ra ngoài */
   transition: transform 0.3s ease;
+  position: relative; /* Thêm để định vị badge */
 }
 
 .product-card:hover {
@@ -192,6 +193,30 @@
   color: #54794a;
   font-weight: bold;
   font-size: 1.4rem;
+}
+
+.old-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 1.1rem;
+    margin-right: 8px;
+    font-weight: normal;
+}
+
+/* Sale Badge */
+.sale-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #ff4747;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(255, 71, 71, 0.3);
+    font-family: 'Dosis', sans-serif;
 }
 
 /* Mobile Responsive */

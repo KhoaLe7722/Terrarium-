@@ -1,0 +1,9 @@
+<?php
+session_start();
+// Xóa session admin
+unset($_SESSION['admin_id']);
+unset($_SESSION['admin_name']);
+unset($_SESSION['admin_email']);
+unset($_SESSION['admin_role']);
+header('Location: index.php');
+exit;
