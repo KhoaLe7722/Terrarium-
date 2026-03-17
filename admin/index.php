@@ -19,13 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = 'Vui lòng nhập email và mật khẩu!';
         $messageType = 'error';
     } else {
-        $stmt = $conn->prepare("SELECT id, name, email, password, vai_tro FROM users WHERE email = ? AND vai_tro = 'quan_tri'");
+        $stmt = $conn->prepare("SELECT id, ho_ten, email, mat_khau, vai_tro FROM users WHERE email = ? AND vai_tro = 'quan_tri'");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($password, $user['password'])) {
+        if ($user && password_verify($password, $user['mat_khau'])) {
             $_SESSION['admin_id'] = $user['id'];
-            $_SESSION['admin_name'] = $user['name'];
+            $_SESSION['admin_name'] = $user['ho_ten'];
             $_SESSION['admin_email'] = $user['email'];
             $_SESSION['admin_role'] = $user['vai_tro'];
             header('Location: dashboard.php');
@@ -94,19 +94,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 32px;
         }
         .login-logo .logo-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #54794a, #6ba060);
-            border-radius: 16px;
+            width: 90px;
+            height: 90px;
+            background: #fff;
+            border: 1px solid rgba(84, 121, 74, 0.12);
+            border-radius: 22px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 16px;
-            box-shadow: 0 8px 24px rgba(84, 121, 74, 0.2);
+            padding: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 28px rgba(84, 121, 74, 0.16);
         }
-        .login-logo .logo-icon i {
-            font-size: 28px;
-            color: #fff;
+        .login-logo .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
         .login-logo h1 {
             color: #333;
@@ -254,7 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-card">
             <div class="login-logo">
                 <div class="logo-icon">
-                    <i class="fas fa-leaf"></i>
+                    <img src="../images/avatar.png" alt="Logo Thuận Phát Garden">
                 </div>
                 <h1>Thuận Phát Garden</h1>
                 <p>Bảng điều khiển quản trị</p>
@@ -293,7 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </form>
 
-            <a href="../trangchu/index.html" class="back-link">
+            <a href="../trangchu/index.php" class="back-link">
                 <i class="fas fa-arrow-left"></i> Quay lại trang chủ
             </a>
         </div>

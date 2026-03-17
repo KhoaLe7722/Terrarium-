@@ -5,10 +5,18 @@ require_once '../dangky_dangnhap/config.php';
 $userId = $_SESSION['user_id'] ?? null;
 $user = null;
 
-if ($userId) {
-    $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->execute([$userId]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$userId) {
+    header('Location: ../dangky_dangnhap/dangnhap.php?redirect=checkout');
+    exit;
+}
+
+$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$userId]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user) {
+    header('Location: ../dangky_dangnhap/logout.php');
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -18,17 +26,14 @@ if ($userId) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="../images/avatar.png" type="image/png" />
-  <title>Thanh toán | Thuận Phát G Garden</title>
+  <title>Thanh toán | Thuận Phát Garden</title>
 
-  <!-- Ionicons -->
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
 
-  <!-- CSS -->
   <link rel="stylesheet" href="../mainfont/main.css" />
   <link rel="stylesheet" href="thanhtoan.css" />
   <style>
@@ -63,7 +68,7 @@ if ($userId) {
           border-radius: 8px;
           font-family: inherit;
       }
-      .form-group input:focus {
+      .form-group input:focus, .form-group textarea:focus {
           border-color: #54794a;
           outline: none;
       }
@@ -96,7 +101,27 @@ if ($userId) {
           background: #45653d;
           transform: translateY(-2px);
       }
-      .success-box { display: none; margin-top: 150px; }
+      .success-box {
+          display: none;
+          margin: 150px auto 50px;
+          text-align: center;
+          max-width: 640px;
+          padding: 32px;
+          background: #fff;
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      }
+      @media (max-width: 768px) {
+          .checkout-form,
+          .success-box {
+              margin: 120px 16px 40px;
+              padding: 22px;
+          }
+
+          .form-row {
+              grid-template-columns: 1fr !important;
+          }
+      }
   </style>
 </head>
 
@@ -106,25 +131,24 @@ if ($userId) {
   <script defer src="../mainfont/main.js"></script>
 
   <div class="container">
-      <!-- Form Thanh Toán -->
       <div id="checkout-section" class="checkout-form">
           <h2 class="form-title">Thông tin giao hàng</h2>
           <form id="orderForm">
               <div class="form-group">
                   <label for="ho_ten_kh">Họ và tên <span style="color:red">*</span></label>
-                  <input type="text" id="ho_ten_kh" name="ho_ten_kh" required 
-                         value="<?php echo htmlspecialchars($user['name'] ?? ''); ?>">
+                  <input type="text" id="ho_ten_kh" name="ho_ten_kh" required
+                         value="<?php echo htmlspecialchars($user['ho_ten'] ?? ''); ?>">
               </div>
-              
+
               <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                   <div class="form-group">
                       <label for="email_kh">Email</label>
-                      <input type="email" id="email_kh" name="email_kh" 
+                      <input type="email" id="email_kh" name="email_kh"
                              value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>">
                   </div>
                   <div class="form-group">
                       <label for="sdt_kh">Số điện thoại</label>
-                      <input type="tel" id="sdt_kh" name="sdt_kh" 
+                      <input type="tel" id="sdt_kh" name="sdt_kh"
                              value="<?php echo htmlspecialchars($user['so_dien_thoai'] ?? ''); ?>">
                   </div>
               </div>
@@ -149,7 +173,6 @@ if ($userId) {
           </form>
       </div>
 
-      <!-- Thông báo thành công -->
       <div id="success-section" class="success-box">
         <div class="success-icon">
           <ion-icon name="checkmark-circle-outline" style="font-size: 80px; color: #54794a;"></ion-icon>

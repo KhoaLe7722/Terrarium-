@@ -8,8 +8,8 @@
         {
             "type": "msedge",
             "request": "launch",
-            "name": "Open index.html",
-            "file": "d:\\CODE\\WEB\\bai-tap-web-cay-kieng\\trangchu\\index.html"
+            "name": "Open index.php",
+            "file": "C:\\xampp\\htdocs\\bai-tap-web-cay-kieng\\trangchu\\index.php"
         }
     ]
 }

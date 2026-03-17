@@ -2,48 +2,51 @@
 session_start();
 require_once 'config.php';
 
+if (!empty($_SESSION['user_id'])) {
+    header('Location: ho_so.php');
+    exit;
+}
+
 $message = '';
-$messageType = ''; // 'success' hoặc 'error'
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    // Validate server-side
-    if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
-        $message = 'Vui lòng điền đầy đủ thông tin!';
-        $messageType = 'error';
+    if ($name === '' || $email === '' || $password === '' || $confirmPassword === '') {
+        $message = 'Vui lòng điền đầy đủ thông tin.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $message = 'Email không hợp lệ!';
-        $messageType = 'error';
-    } elseif (strlen($password) < 8) {
-        $message = 'Mật khẩu phải có ít nhất 8 ký tự!';
-        $messageType = 'error';
-    } elseif ($password !== $confirm_password) {
-        $message = 'Mật khẩu xác nhận không khớp!';
-        $messageType = 'error';
+        $message = 'Email không hợp lệ.';
+    } elseif (mb_strlen($password) < 8) {
+        $message = 'Mật khẩu phải có ít nhất 8 ký tự.';
+    } elseif ($password !== $confirmPassword) {
+        $message = 'Mật khẩu xác nhận không khớp.';
     } else {
-        // Kiểm tra email đã tồn tại chưa
-        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
         $stmt->execute([$email]);
 
-        if ($stmt->rowCount() > 0) {
-            $message = 'Email này đã được sử dụng!';
-            $messageType = 'error';
+        if ($stmt->fetch()) {
+            $message = 'Email này đã được sử dụng.';
         } else {
-            // Hash mật khẩu và lưu vào database
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+            $stmt = $conn->prepare("
+                INSERT INTO users (ho_ten, email, mat_khau, vai_tro)
+                VALUES (?, ?, ?, 'khach')
+            ");
 
             if ($stmt->execute([$name, $email, $hashedPassword])) {
-                $message = 'Đăng ký thành công! Chào mừng bạn đến cửa hàng Thuận Phát G Garden chúng tôi';
-                $messageType = 'success';
-            } else {
-                $message = 'Đã xảy ra lỗi, vui lòng thử lại!';
-                $messageType = 'error';
+                $_SESSION['user_id'] = (int) $conn->lastInsertId();
+                $_SESSION['user_name'] = $name;
+                $_SESSION['user_email'] = $email;
+                $_SESSION['user_role'] = 'khach';
+
+                header('Location: ho_so.php');
+                exit;
             }
+
+            $message = 'Không thể tạo tài khoản, vui lòng thử lại.';
         }
     }
 }
@@ -55,30 +58,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="../images/avatar.png" type="image/png" />
-    <title>Đăng ký | Thuận Phát G Garden</title>
+    <title>Đăng ký | Thuận Phát Garden</title>
 
-    <!-- Ionicons -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet" />
 
-    <!-- External CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
-    <!-- Main CSS -->
     <link rel="stylesheet" href="../mainfont/main.css" />
     <link rel="stylesheet" href="dangky_dangnhap.css" />
 </head>
 
 <body data-page="login">
-    <!-- Header được render từ JS -->
     <nav class="navigation" id="main-nav"></nav>
-    <!-- Import Layout JS -->
     <script defer src="../mainfont/layout.js"></script>
     <script defer src="../mainfont/main.js"></script>
 
@@ -90,21 +87,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="dangnhap.php" class="auth-form__switch-btn">Đăng nhập</a>
                 </div>
 
+                <?php if ($message !== ''): ?>
+                    <div style="margin-bottom:16px;padding:12px 14px;border-radius:8px;background:#fff3f3;color:#b42318;font-size:14px;">
+                        <?= htmlspecialchars($message) ?>
+                    </div>
+                <?php endif; ?>
+
                 <form id="registerForm" method="POST" action="dangky.php">
                     <div class="auth-form__form">
                         <div class="auth-form__group">
-                            <label for="name" class="form-label">Tên đầy đủ</label>
+                            <label for="name" class="form-label">Họ và tên</label>
                             <input id="name" name="name" type="text" class="auth-form__input"
-                                placeholder="VD: Trần Nam Cường" required
-                                value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>" />
+                                placeholder="VD: Nguyễn Văn A" required
+                                value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" />
                             <small id="feedback-name" class="form-message"></small>
                         </div>
 
                         <div class="auth-form__group">
                             <label for="email" class="form-label">Email</label>
-                            <input id="email" name="email" type="text" class="auth-form__input"
-                                placeholder="VD: trancuong111101@gmail.com" required
-                                value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" />
+                            <input id="email" name="email" type="email" class="auth-form__input"
+                                placeholder="VD: email@domain.com" required
+                                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" />
                             <small id="feedback-email" class="form-message"></small>
                         </div>
 
@@ -123,52 +126,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
 
-                    <div class="auth-form__aside">
-                        <p class="auth-form__policy-text">
-                            Bằng việc đăng ký, bạn đã đồng ý với cửa hàng Thuận Phát G Garden chúng tôi về
-                            <a href="#" class="auth-form__text-link">Điều khoản dịch vụ & </a>
-                            <a href="#" class="auth-form__text-link">Chính sách bảo mật</a>
-                        </p>
-                    </div>
-
                     <div class="auth-form__controls">
-                        <a href="../trangchu/index.html" class="btn btn--normal auth-form__controls-back">TRỞ LẠI</a>
-                        <button type="submit" class="btn btn--primary">ĐĂNG KÝ</button>
-                    </div>
-
-                    <div class="auth-form__socials">
-                        <a href="#" class="auth-form__socials--facebook btn btn--size-s btn--with-icon">
-                            <i class="auth-form__socials-icon fab fa-facebook-square"></i>
-                            <span class="auth-form__socials-title"> Kết nối với Facebook</span>
-                        </a>
-                        <a href="#" class="auth-form__socials--google btn btn--size-s btn--with-icon">
-                            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"
-                                class="auth-form__google-img" />
-                            <span class="auth-form__socials-title">Kết nối với Google</span>
-                        </a>
+                        <a href="../trangchu/index.php" class="btn btn--normal auth-form__controls-back">TRANG CHỦ</a>
+                        <button type="submit" class="btn btn--primary">TẠO TÀI KHOẢN</button>
                     </div>
                 </form>
             </div>
         </div>
-
-        <!-- Thông báo thành công -->
-        <div class="box__success" style="display: <?php echo ($messageType === 'success') ? 'block' : 'none'; ?>;">
-            <img class="img__success" src="../images/dangky_dangnhap/success.png" alt="thông báo">
-            <p><?php echo $message; ?></p>
-            <a href="dangnhap.php" class="button__success" style="display:inline-block; text-decoration:none; text-align:center;">Đăng nhập ngay</a>
-        </div>
-
-        <!-- Thông báo lỗi -->
-        <div class="box__fail" style="display: <?php echo ($messageType === 'error') ? 'block' : 'none'; ?>;">
-            <img class="img__fail" src="../images/dangky_dangnhap/fail.png" alt="thông báo">
-            <p><?php echo $message; ?></p>
-            <button type="button" class="button__fail" onclick="this.parentElement.style.display='none'">Đã hiểu</button>
-        </div>
     </main>
 
-    <!-- Footer được render từ JS -->
     <footer class="site-footer" id="site-footer"></footer>
-
     <script src="dangky.js"></script>
 </body>
 

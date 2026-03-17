@@ -36,12 +36,15 @@ body {
 }
 
 .product-images-main {
+  display: block;
   width: 100%;
-  max-height: 400px;
-  object-fit: cover;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  height: 460px;
+  object-fit: contain;
+  background: linear-gradient(180deg, #f8fbf4 0%, #ffffff 100%);
+  border: 1px solid #d9e4d1;
+  border-radius: 24px;
+  margin-bottom: 14px;
+  padding: 16px;
 }
 
 .container {
@@ -52,21 +55,28 @@ body {
 
 .product-thumbnails {
   display: flex;
-  gap: 10px;
-  justify-content: center;
+  gap: 12px;
+  justify-content: flex-start;
   flex-wrap: wrap;
 }
 
 .product-thumb {
-  border-radius: 10px;
-  width: 100px;
-  margin: 5px;
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid #d9e4d1;
+  border-radius: 18px;
+  padding: 6px;
+  margin: 0;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .product-thumb:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px);
+  border-color: #94c947;
+  box-shadow: 0 10px 18px rgba(84, 121, 74, 0.14);
 }
 
 /* Modal ảnh */
@@ -344,34 +354,71 @@ body {
 
 .product-suggestion-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 14px;
   margin-top: 15px;
 }
 
-.product-suggestion-grid .product-card {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
+.suggestion-card {
   background-color: #fff;
-  border-radius: 8px;
-  transition: transform 0.2s ease;
+  border: 1px solid #e1e1e1;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.product-suggestion-grid .product-card img {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 6px;
+.suggestion-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
-.product-suggestion-grid .product-card h4 {
-  font-size: 14px;
-  margin: 8px 0 4px;
+.suggestion-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 
-.product-suggestion-grid .price {
+.suggestion-image-wrap {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f9fcf3 0%, #ffffff 100%);
+}
+
+.suggestion-image {
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  transition: transform 0.3s ease;
+}
+
+.suggestion-card:hover .suggestion-image {
+  transform: scale(1.04);
+}
+
+.suggestion-content {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestion-title {
+  min-height: 42px;
+  font-size: 16px;
   font-weight: bold;
-  color: #009933;
-  font-size: 14px;
+  color: #333;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.suggestion-price {
+  color: #54794a;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
 }

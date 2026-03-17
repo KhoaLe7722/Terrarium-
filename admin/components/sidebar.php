@@ -5,7 +5,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 <aside class="admin-sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">
-            <i class="fas fa-leaf"></i>
+            <img src="../images/avatar.png" alt="Logo Thuận Phát Garden">
         </div>
         <div class="sidebar-brand">
             Thuận Phát Garden
@@ -26,12 +26,15 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <a href="discount.php" class="nav-item <?= $currentPage == 'discount.php' ? 'active' : '' ?>">
             <i class="fas fa-tags"></i> Giảm giá
         </a>
-        <a href="orders.php" class="nav-item <?= $currentPage == 'orders.php' ? 'active' : '' ?>">
+        <a href="orders.php" class="nav-item <?= in_array($currentPage, ['orders.php', 'order_detail.php']) ? 'active' : '' ?>">
             <i class="fas fa-shopping-cart"></i> Đơn hàng
+        </a>
+        <a href="customers.php" class="nav-item <?= $currentPage == 'customers.php' ? 'active' : '' ?>">
+            <i class="fas fa-users"></i> Khách hàng
         </a>
         
         <div class="nav-label">Website</div>
-        <a href="../trangchu/index.html" class="nav-item" target="_blank">
+        <a href="../trangchu/index.php" class="nav-item" target="_blank">
             <i class="fas fa-globe"></i> Xem trang chính
         </a>
     </nav>

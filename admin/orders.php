@@ -93,9 +93,9 @@ $statuses = [
                                                 </select>
                                             </td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline" onclick="alert('Chức năng sửa chi tiết chưa hoàn thiện trong template này')">
+                                                <a href="order_detail.php?id=<?= $o['id'] ?>" class="btn btn-sm btn-outline">
                                                     Chi tiết
-                                                </button>
+                                                </a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

@@ -1,143 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="refresh" content="0; url=sanpham.php" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tất cả sản phẩm | Thuận Phát G Garden</title>
-  <link rel="icon" href="../images/avatar.png" type="image/png" />
-  <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="sanpham.css" />
-  <link rel="stylesheet" href="../mainfont/main.css" />
-  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-  <script src="sanpham-data.js"></script>
-</head>
-
-<body data-page="products">
-
-  <!-- ===== HEADER ===== -->
-  <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js"></script>
-  <script defer src="../mainfont/main.js"></script>
-
-  <!--<section class="bread-crumb">
-    <div class="container">
-      <div class="nd-main-title-breadcrumb text-center">Tất cả sản phẩm</div>
-      <ul class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
-        <li class="home" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-          <a itemprop="item" href="/trangchu/index.html" title="Trang chủ">
-            <span itemprop="name">Trang chủ</span>
-            <meta itemprop="position" content="1" />
-          </a>
-        </li>
-        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-          <strong>
-            <span itemprop="name">Tất cả sản phẩm</span>
-            <meta itemprop="position" content="2" />
-          </strong>
-        </li>
-      </ul>
-    </div>
-  </section>-->
-  <div class="page-header">
-    <h1>Tất cả sản phẩm</h1>
-    <div class="breadcrumb">
-      <a href="../trangchu/index.html">Trang chủ</a> &gt;
-      <span>Tất cả sản phẩm</span>
-    </div>
-  </div>
-
-
-  <!-- ===== MAIN CONTENT ===== -->
-  <main class="container">
-    <div class="grid-layout">
-
-      <!-- Loc san pham -->
-      <aside class="sidebar filter-sidebar">
-        <h3 class="aside-titles">Lọc sản phẩm</h3>
-        <div class="filter-group">
-          <ul>
-            <li class="filter-item">
-              <label><input type="checkbox"> Giá dưới 100.000đ</label>
-            </li>
-            <li class="filter-item">
-              <label><input type="checkbox"> 100.000đ - 200.000đ</label>
-            </li>
-            <li class="filter-item">
-              <label><input type="checkbox"> 200.000đ - 300.000đ</label>
-            </li>
-            <li class="filter-item">
-              <label><input type="checkbox"> 300.000đ - 500.000đ</label>
-            </li>
-            <li class="filter-item">
-              <label><input type="checkbox"> 500.000đ - 1.000.000đ</label>
-            </li>
-            <li class="filter-item">
-              <label><input type="checkbox"> Trên 1.000.000đ</label>
-            </li>
-          </ul>
-        </div>
-      </aside>
-
-      <!-- San pham -->
-      <section class="product-section">
-        <div class="product-grid">
-          <!-- Sản phẩm được thêm bằng JavaScript -->
-        </div>
-      </section>
-    </div>
-  </main>
-
-  <!-- ===== FOOTER ===== -->
-  <footer class="site-footer" id="site-footer"></footer>
-
+  <title>Dang chuyen trang...</title>
   <script>
-    const products = [
-      {
-        id: 1,
-        name: "Terrarium Rêu Mini",
-        price: 180000,
-        image: "image_sanpham/1.jpg"
-      },
-      {
-        id: 2,
-        name: "Terrarium Lớn Sang Trọng",
-        price: 320000,
-        image: "../images/sp2.jpg"
-      },
-      {
-        id: 3,
-        name: "Bình Trang Trí Phong Cách Nhật",
-        price: 250000,
-        image: "../images/sp3.jpg"
-      },
-      {
-        id: 4,
-        name: "Combo Rêu + Phụ kiện",
-        price: 480000,
-        image: "../images/sp4.jpg"
-      },
-      {
-        id: 5,
-        name: "Terrarium Gỗ Tự Nhiên",
-        price: 350000,
-        image: "../images/sp5.jpg"
-      }
-    ];
-
-    const grid = document.querySelector('.product-grid');
-    grid.innerHTML = products.map(product => `
-    <div class="product-card">
-      <a href="spchitiet.html?id=${product.id}">
-        <img src="${product.image}" alt="${product.name}">
-        <h3>${product.name}</h3>
-        <p class="price">${product.price.toLocaleString()}đ</p>
-      </a>
-    </div>
-  `).join('');
+    window.location.replace("sanpham.php");
   </script>
-
+</head>
+<body>
+  <p>Dang chuyen den danh sach san pham moi. Neu khong tu dong chuyen, hay <a href="sanpham.php">bam vao day</a>.</p>
 </body>
-
 </html>

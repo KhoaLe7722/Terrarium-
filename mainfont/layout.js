@@ -1,48 +1,101 @@
+var STORE_PATHS = {
+  home: "../trangchu/index.php",
+  products: "../sanpham/sanpham.php",
+  about: "../gioithieu/gioithieu.html",
+  news: "../tintuc/tintuc.html",
+  guide: "../huongdan/huongdan.html",
+  cart: "../giohang/giohang.html",
+  login: "../dangky_dangnhap/dangnhap.php",
+  register: "../dangky_dangnhap/dangky.php",
+  profile: "../dangky_dangnhap/ho_so.php",
+  logout: "../dangky_dangnhap/logout.php",
+  admin: "../admin/dashboard.php"
+};
+
 var NAV_ITEMS = [
-  { key: "home", href: "../trangchu/index.html", icon: "home-outline", label: "Trang Chủ" },
-  { key: "products", href: "../sanpham/sanpham.html", icon: "leaf-outline", label: "Sản Phẩm" },
-  { key: "about", href: "../gioithieu/gioithieu.html", icon: "information-circle-outline", label: "Giới Thiệu" },
-  { key: "news", href: "../tintuc/tintuc.html", icon: "newspaper-outline", label: "Tin Tức" },
-  { key: "guide", href: "../huongdan/huongdan.html", icon: "book-outline", label: "Hướng Dẫn" }
+  { key: "home", href: STORE_PATHS.home, icon: "home-outline", label: "Trang chủ" },
+  { key: "products", href: STORE_PATHS.products, icon: "leaf-outline", label: "Sản phẩm" },
+  { key: "about", href: STORE_PATHS.about, icon: "information-circle-outline", label: "Giới thiệu" },
+  { key: "news", href: STORE_PATHS.news, icon: "newspaper-outline", label: "Tin tức" },
+  { key: "guide", href: STORE_PATHS.guide, icon: "book-outline", label: "Hướng dẫn" }
 ];
+
+var sessionState = {
+  loggedIn: false,
+  userName: "",
+  userRole: "khach",
+  adminUrl: null
+};
 
 var FOOTER_HTML = '' +
   '<div class="footer-container">' +
   '<div class="footer-column">' +
   '<h3>Về Chúng Tôi</h3>' +
-  '<p>Thuận Phát G Garden chuyên cung cấp các loại terrarium độc đáo, mang thiên nhiên đến gần hơn với bạn.</p>' +
-  '<p>• Vườn nhiệt đới cây và rêu trong bể kính </p>' +
-  '<p>• Trung thực với khách hàng - Sáng tạo với nghệ thuật</p>' +
+  '<p>Thuận Phát Garden chuyên cung cấp terrarium và cây kiểng trang trí cho không gian sống xanh hơn.</p>' +
+  '<p>• Sản phẩm được chăm chút kỹ lưỡng, dễ trưng bày và dễ chăm sóc.</p>' +
+  '<p>• Mua sắm rõ ràng, thuận tiện và phù hợp với nhu cầu hằng ngày.</p>' +
   '</div>' +
   '<div class="footer-column">' +
   '<h3>Liên Kết Nhanh</h3>' +
   '<ul>' +
-  '<li><a href="../trangchu/index.html">Trang Chủ</a></li>' +
-  '<li><a href="../sanpham/sanpham.html">Sản Phẩm</a></li>' +
-  '<li><a href="../gioithieu/gioithieu.html">Giới Thiệu</a></li>' +
-  '<li><a href="../huongdan/huongdan.html">Hướng Dẫn</a></li>' +
-  '<li><a href="../lienhe/lienhe.html">Liên Hệ</a></li>' +
+  '<li><a href="' + STORE_PATHS.home + '">Trang chủ</a></li>' +
+  '<li><a href="' + STORE_PATHS.products + '">Sản phẩm</a></li>' +
+  '<li><a href="' + STORE_PATHS.about + '">Giới thiệu</a></li>' +
+  '<li><a href="' + STORE_PATHS.guide + '">Hướng dẫn</a></li>' +
+  '<li><a href="' + STORE_PATHS.news + '">Tin tức</a></li>' +
   '</ul>' +
   '</div>' +
   '<div class="footer-column">' +
   '<h3>Liên Hệ</h3>' +
   '<p><ion-icon name="call-outline"></ion-icon> 083 977 8271</p>' +
   '<p><ion-icon name="mail-outline"></ion-icon> thuanphatggarden@gmail.com</p>' +
-  '<p><ion-icon name="location-outline"></ion-icon> Quán nước HOA YÊN, 131 đường Lý Tự Trọng, Cần Thơ.</p>' +
-  '<p><ion-icon name="location-outline"></ion-icon> Ngọc Trương Coffee, 372B Đ. Nguyễn Văn Cừ, Phường An Khánh, Ninh Kiều, Cần Thơ.</p>' +
-  '<p><ion-icon name="location-outline"></ion-icon> Tổ Của Yến Coffee, số 13, đường Trần Ngọc Quế, P Xuân Khánh, Q Ninh Kiều, TP Cần Thơ.</p>' +
+  '<p><ion-icon name="location-outline"></ion-icon> 131 Lý Tự Trọng, Cần Thơ</p>' +
   '</div>' +
   '<div class="footer-column">' +
   '<h3>Theo Dõi Chúng Tôi</h3>' +
   '<div class="social-icons">' +
-  '<a href="https://www.facebook.com/thuanphatggarden" target="_blank"><ion-icon name="logo-facebook"></ion-icon></a>' +
-  '<a href="https://www.youtube.com/@anhshopcantho/featured" target="_blank"><ion-icon name="logo-youtube"></ion-icon></a>' +
+  '<a href="https://www.facebook.com/thuanphatggarden" target="_blank" rel="noreferrer"><ion-icon name="logo-facebook"></ion-icon></a>' +
+  '<a href="https://www.youtube.com/@anhshopcantho/featured" target="_blank" rel="noreferrer"><ion-icon name="logo-youtube"></ion-icon></a>' +
   '</div>' +
   '</div>' +
   '</div>' +
   '<div class="footer-bottom">' +
-  '&copy; Bản quyền thuộc về Thuận Phát G Garden.' +
+  '&copy; Bản quyền thuộc về Thuận Phát Garden.' +
   '</div>';
+
+function buildAccountDropdown() {
+  if (!sessionState.loggedIn) {
+    return '' +
+      '<div class="login-container">' +
+      '<div class="login-trigger">' +
+      '<span class="icon"><ion-icon name="person-outline"></ion-icon></span>' +
+      '<span class="text">Đăng nhập</span>' +
+      '</div>' +
+      '<div class="login-dropdown">' +
+      '<a href="' + STORE_PATHS.login + '">Đăng nhập</a>' +
+      '<a href="' + STORE_PATHS.register + '">Đăng ký</a>' +
+      '</div>' +
+      '</div>';
+  }
+
+  var userLabel = sessionState.userName || 'Tài khoản';
+  var adminLink = sessionState.userRole === 'quan_tri' && sessionState.adminUrl
+    ? '<a href="' + sessionState.adminUrl + '">Quản trị</a>'
+    : '';
+
+  return '' +
+    '<div class="login-container">' +
+    '<div class="login-trigger">' +
+    '<span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>' +
+    '<span class="text">' + userLabel + '</span>' +
+    '</div>' +
+    '<div class="login-dropdown">' +
+    '<a href="' + STORE_PATHS.profile + '">Hồ sơ</a>' +
+    adminLink +
+    '<a href="' + STORE_PATHS.logout + '">Đăng xuất</a>' +
+    '</div>' +
+    '</div>';
+}
 
 function buildNav(activeKey) {
   var links = '';
@@ -58,8 +111,7 @@ function buildNav(activeKey) {
   }
 
   return '<div class="nav-wrapper">' +
-    // Hamburger button for mobile
-    '<button class="hamburger-btn" id="hamburger-btn" aria-label="Menu">' +
+    '<button class="hamburger-btn" id="hamburger-btn" aria-label="Mở menu">' +
     '<span class="hamburger-line"></span>' +
     '<span class="hamburger-line"></span>' +
     '<span class="hamburger-line"></span>' +
@@ -68,28 +120,19 @@ function buildNav(activeKey) {
     links +
     '</ul>' +
     '<div class="nav-logo">' +
-    '<a href="../trangchu/index.html">' +
-    '<img src="../images/Head.jpg" alt="Logo" />' +
+    '<a href="' + STORE_PATHS.home + '">' +
+    '<img src="../images/Head.jpg" alt="Logo Thuận Phát Garden" />' +
     '</a>' +
     '</div>' +
     '<ul class="nav-right">' +
     '<li class="list right-action">' +
-    '<a href="../giohang/giohang.html" id="cart-toggle">' +
+    '<a href="' + STORE_PATHS.cart + '" id="cart-toggle">' +
     '<span class="icon"><ion-icon name="cart-outline"></ion-icon></span>' +
-    '<span class="text">Giỏ Hàng</span>' +
+    '<span class="text">Giỏ hàng</span>' +
     '</a>' +
     '</li>' +
     '<li class="list right-action">' +
-    '<div class="login-container">' +
-    '<div class="login-trigger">' +
-    '<span class="icon"><ion-icon name="person-outline"></ion-icon></span>' +
-    '<span class="text">Đăng Nhập</span>' +
-    '</div>' +
-    '<div class="login-dropdown">' +
-    '<a href="../dangky_dangnhap/dangnhap.html">Đăng Nhập</a>' +
-    '<a href="../dangky_dangnhap/dangky.html">Đăng Ký</a>' +
-    '</div>' +
-    '</div>' +
+    buildAccountDropdown() +
     '</li>' +
     '</ul>' +
     '<div class="indicator"></div>' +
@@ -103,6 +146,7 @@ function renderNav() {
 
   var activeKey = document.body.getAttribute("data-page") || "";
   nav.innerHTML = buildNav(activeKey);
+  document.dispatchEvent(new CustomEvent("layout:updated"));
 }
 
 function renderFooter() {
@@ -111,7 +155,28 @@ function renderFooter() {
   footer.innerHTML = FOOTER_HTML;
 }
 
+function loadSession() {
+  return fetch("../dangky_dangnhap/check_session.php", { credentials: "same-origin" })
+    .then(function (response) { return response.json(); })
+    .then(function (data) {
+      sessionState.loggedIn = !!data.loggedIn;
+      sessionState.userName = data.userName || "";
+      sessionState.userRole = data.userRole || "khach";
+      sessionState.adminUrl = data.adminUrl || null;
+    })
+    .catch(function () {
+      sessionState.loggedIn = false;
+      sessionState.userName = "";
+      sessionState.userRole = "khach";
+      sessionState.adminUrl = null;
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   renderNav();
   renderFooter();
+
+  loadSession().then(function () {
+    renderNav();
+  });
 });

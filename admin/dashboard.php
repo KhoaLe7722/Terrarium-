@@ -23,6 +23,28 @@ $tongKhachHang = $stmt->fetchColumn() ?: 0;
 $stmt = $conn->query("SELECT id, ho_ten_kh, tong_tien, trang_thai, ngay_dat FROM orders ORDER BY ngay_dat DESC LIMIT 5");
 $recentOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+$monthlyRows = $conn->query("
+    SELECT DATE_FORMAT(ngay_dat, '%Y-%m') AS month_key, SUM(tong_tien) AS total
+    FROM orders
+    WHERE trang_thai IN ('dang_giao', 'da_giao')
+      AND ngay_dat >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+    GROUP BY DATE_FORMAT(ngay_dat, '%Y-%m')
+    ORDER BY month_key ASC
+")->fetchAll(PDO::FETCH_ASSOC);
+
+$monthlyMap = [];
+foreach ($monthlyRows as $row) {
+    $monthlyMap[$row['month_key']] = (float) $row['total'];
+}
+
+$chartLabels = [];
+$chartData = [];
+for ($offset = 6; $offset >= 0; $offset--) {
+    $monthKey = date('Y-m', strtotime("-{$offset} month"));
+    $chartLabels[] = 'T' . date('m', strtotime($monthKey . '-01'));
+    $chartData[] = $monthlyMap[$monthKey] ?? 0;
+}
+
 // Mảng label trạng thái đơn hàng
 $statusLabels = [
     'cho_xac_nhan' => ['Chờ xác nhận', 'warning'],
@@ -141,10 +163,10 @@ $statusLabels = [
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                    labels: <?= json_encode($chartLabels) ?>,
                     datasets: [{
                         label: 'Doanh thu (VNĐ)',
-                        data: [0, 0, <?= $doanhThu / 2 ?>, <?= $doanhThu ?>, 0, 0, 0], // Sample data, mostly to demonstrate
+                        data: <?= json_encode($chartData) ?>,
                         backgroundColor: 'rgba(84, 121, 74, 0.7)',
                         borderColor: '#54794a',
                         borderWidth: 1,

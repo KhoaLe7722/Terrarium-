@@ -162,6 +162,8 @@ function initNavigation() {
 }
 
 document.addEventListener('DOMContentLoaded', initNavigation);
+document.addEventListener('layout:updated', initNavigation);
+window.initNavigation = initNavigation;
 
 
 // ==== Popup Giỏ hàng hover ====

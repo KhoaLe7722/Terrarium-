@@ -12,24 +12,32 @@ function showSlide(index) {
   });
 }
 
-setInterval(() => {
-  currentIndex = (currentIndex + 1) % slides.length;
-  showSlide(currentIndex);
-}, 15000);
-
-dots.forEach((dot, i) => {
-  dot.addEventListener("click", () => {
-    currentIndex = i;
+if (slides.length && dots.length) {
+  setInterval(() => {
+    currentIndex = (currentIndex + 1) % slides.length;
     showSlide(currentIndex);
+  }, 15000);
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener("click", () => {
+      currentIndex = i;
+      showSlide(currentIndex);
+    });
   });
-});
-// Bắt sự kiện khi click nút mũi tên
-nextBtn.addEventListener("click", () => {
-  currentIndex = (currentIndex + 1) % slides.length;
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % slides.length;
+      showSlide(currentIndex);
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+      showSlide(currentIndex);
+    });
+  }
+
   showSlide(currentIndex);
-});
-prevBtn.addEventListener("click", () => {
-  currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-  showSlide(currentIndex);
-});
-showSlide(currentIndex);
+}
