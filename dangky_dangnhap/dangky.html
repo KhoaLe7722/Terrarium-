@@ -6,10 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dang chuyen trang...</title>
   <script>
-    window.location.replace("dangky.php");
+    window.location.replace("dangky.php" + window.location.search);
   </script>
 </head>
 <body>
-  <p>Dang chuyen den trang dang ky moi. Neu khong tu dong chuyen, hay <a href="dangky.php">bam vao day</a>.</p>
+  <p>Dang chuyen den trang dang ky moi. Neu khong tu dong chuyen, hay <a id="fallback-register" href="dangky.php">bam vao day</a>.</p>
+  <script>
+    document.getElementById("fallback-register").href = "dangky.php" + window.location.search;
+  </script>
 </body>
 </html>

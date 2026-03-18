@@ -40,7 +40,7 @@ $featuredPayload = array_map(
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../mainfont/main.css" />
+  <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
   <link rel="stylesheet" href="index.css?v=20260316-11" />
   <style>
     .home-featured-wrap {
@@ -362,8 +362,8 @@ $featuredPayload = array_map(
 
 <body data-page="home">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js"></script>
-  <script defer src="../mainfont/main.js"></script>
+  <script defer src="../mainfont/layout.js?v=20260318-2"></script>
+  <script defer src="../mainfont/main.js?v=20260318-2"></script>
 
   <div class="slider">
     <div class="slides">

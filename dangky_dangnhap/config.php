@@ -66,6 +66,124 @@ if (!function_exists('safe_exec')) {
     }
 }
 
+if (!function_exists('normalize_auth_redirect_key')) {
+    function normalize_auth_redirect_key(?string $key): string
+    {
+        $allowedKeys = ['checkout', 'home', 'profile'];
+        return in_array($key, $allowedKeys, true) ? $key : 'profile';
+    }
+}
+
+if (!function_exists('resolve_auth_redirect_target')) {
+    function resolve_auth_redirect_target(?string $key): string
+    {
+        $routes = [
+            'checkout' => '../thanhtoan/thanhtoan.php',
+            'home' => '../trangchu/index.php',
+            'profile' => 'ho_so.php',
+        ];
+
+        $normalizedKey = normalize_auth_redirect_key($key);
+        return $routes[$normalizedKey] ?? 'ho_so.php';
+    }
+}
+
+if (!function_exists('build_auth_page_url')) {
+    function build_auth_page_url(string $path, ?string $redirectKey): string
+    {
+        $normalizedKey = normalize_auth_redirect_key($redirectKey);
+        return $path . '?redirect=' . rawurlencode($normalizedKey);
+    }
+}
+
+if (!function_exists('normalize_user_email')) {
+    function normalize_user_email(string $email): string
+    {
+        return strtolower(trim($email));
+    }
+}
+
+if (!function_exists('is_password_hash_value')) {
+    function is_password_hash_value(string $value): bool
+    {
+        $info = password_get_info($value);
+        return !empty($info['algo']);
+    }
+}
+
+if (!function_exists('persist_user_password_hash')) {
+    function persist_user_password_hash(PDO $conn, int $userId, string $hash): void
+    {
+        $columns = ['mat_khau'];
+
+        if (db_column_exists($conn, 'users', 'password')) {
+            $columns[] = 'password';
+        }
+
+        $setClauses = [];
+        $params = [];
+        foreach ($columns as $column) {
+            $setClauses[] = $column . ' = ?';
+            $params[] = $hash;
+        }
+
+        $params[] = $userId;
+        $sql = "UPDATE users SET " . implode(', ', $setClauses) . " WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($params);
+    }
+}
+
+if (!function_exists('verify_and_upgrade_user_password')) {
+    function verify_and_upgrade_user_password(PDO $conn, array $user, string $plainPassword): bool
+    {
+        $storedPassword = (string) ($user['mat_khau'] ?? '');
+        if ($storedPassword === '') {
+            return false;
+        }
+
+        $isHashedPassword = is_password_hash_value($storedPassword);
+        $isValid = $isHashedPassword
+            ? password_verify($plainPassword, $storedPassword)
+            : hash_equals($storedPassword, $plainPassword);
+
+        if (!$isValid) {
+            return false;
+        }
+
+        if (!$isHashedPassword || password_needs_rehash($storedPassword, PASSWORD_DEFAULT)) {
+            $newHash = password_hash($plainPassword, PASSWORD_DEFAULT);
+            persist_user_password_hash($conn, (int) $user['id'], $newHash);
+        }
+
+        return true;
+    }
+}
+
+if (!function_exists('create_user_account')) {
+    function create_user_account(PDO $conn, string $name, string $email, string $passwordHash, string $role = 'khach'): bool
+    {
+        $columns = ['ho_ten', 'email', 'mat_khau', 'vai_tro'];
+        $params = [$name, $email, $passwordHash, $role];
+
+        if (db_column_exists($conn, 'users', 'name')) {
+            $columns[] = 'name';
+            $params[] = $name;
+        }
+
+        if (db_column_exists($conn, 'users', 'password')) {
+            $columns[] = 'password';
+            $params[] = $passwordHash;
+        }
+
+        $placeholders = implode(', ', array_fill(0, count($columns), '?'));
+        $sql = 'INSERT INTO users (' . implode(', ', $columns) . ') VALUES (' . $placeholders . ')';
+        $stmt = $conn->prepare($sql);
+
+        return $stmt->execute($params);
+    }
+}
+
 if (!function_exists('ensure_store_schema')) {
     function ensure_store_schema(PDO $conn): void
     {
@@ -217,15 +335,13 @@ if (!function_exists('ensure_store_schema')) {
         $stmt->execute([$adminEmail]);
 
         if ((int) $stmt->fetchColumn() === 0) {
-            $stmt = $conn->prepare("
-                INSERT INTO users (ho_ten, email, mat_khau, vai_tro)
-                VALUES (?, ?, ?, 'quan_tri')
-            ");
-            $stmt->execute([
+            create_user_account(
+                $conn,
                 'Quan Tri Vien',
                 $adminEmail,
-                password_hash('Admin@123', PASSWORD_BCRYPT)
-            ]);
+                password_hash('Admin@123', PASSWORD_BCRYPT),
+                'quan_tri'
+            );
         } else {
             $stmt = $conn->prepare("
                 UPDATE users

@@ -67,7 +67,7 @@ function buildAccountDropdown() {
   if (!sessionState.loggedIn) {
     return '' +
       '<div class="login-container">' +
-      '<div class="login-trigger">' +
+      '<div class="login-trigger" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">' +
       '<span class="icon"><ion-icon name="person-outline"></ion-icon></span>' +
       '<span class="text">Đăng nhập</span>' +
       '</div>' +
@@ -85,7 +85,7 @@ function buildAccountDropdown() {
 
   return '' +
     '<div class="login-container">' +
-    '<div class="login-trigger">' +
+    '<div class="login-trigger" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">' +
     '<span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>' +
     '<span class="text">' + userLabel + '</span>' +
     '</div>' +

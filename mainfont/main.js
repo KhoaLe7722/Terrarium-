@@ -109,24 +109,93 @@ function initNavigation() {
   });
 
   // ==== Dropdown đăng nhập ====
-  var loginContainer = document.querySelector('.login-container');
-  var dropdown = loginContainer ? loginContainer.querySelector('.login-dropdown') : null;
-  var hideTimeout;
+  if (window.accountMenuCleanup) {
+    window.accountMenuCleanup();
+    window.accountMenuCleanup = null;
+  }
 
-  if (loginContainer && dropdown) {
+  var loginContainer = nav.querySelector('.login-container');
+  var loginTrigger = loginContainer ? loginContainer.querySelector('.login-trigger') : null;
+
+  if (loginContainer && loginTrigger) {
+    var accountCloseTimer = null;
+    var dropdownLinks = loginContainer.querySelectorAll('.login-dropdown a');
+
+    function clearAccountCloseTimer() {
+      if (accountCloseTimer) {
+        clearTimeout(accountCloseTimer);
+        accountCloseTimer = null;
+      }
+    }
+
+    function setAccountMenuOpen(isOpen) {
+      clearAccountCloseTimer();
+      loginContainer.classList.toggle('active', isOpen);
+      loginTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    function scheduleAccountMenuClose() {
+      clearAccountCloseTimer();
+      accountCloseTimer = setTimeout(function () {
+        setAccountMenuOpen(false);
+      }, 220);
+    }
+
     loginContainer.addEventListener('mouseenter', function () {
-      clearTimeout(hideTimeout);
-      dropdown.style.display = 'flex';
-      dropdown.style.opacity = '1';
-      dropdown.style.pointerEvents = 'auto';
+      setAccountMenuOpen(true);
     });
 
     loginContainer.addEventListener('mouseleave', function () {
-      hideTimeout = setTimeout(function () {
-        dropdown.style.opacity = '0';
-        dropdown.style.pointerEvents = 'none';
-      }, 300);
+      scheduleAccountMenuClose();
     });
+
+    loginContainer.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+
+    loginTrigger.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      setAccountMenuOpen(!loginContainer.classList.contains('active'));
+    });
+
+    loginTrigger.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setAccountMenuOpen(!loginContainer.classList.contains('active'));
+      }
+
+      if (e.key === 'Escape') {
+        setAccountMenuOpen(false);
+      }
+    });
+
+    var closeAccountMenu = function (e) {
+      if (!loginContainer.contains(e.target)) {
+        setAccountMenuOpen(false);
+      }
+    };
+
+    var closeAccountMenuOnEscape = function (e) {
+      if (e.key === 'Escape') {
+        setAccountMenuOpen(false);
+      }
+    };
+
+    for (var n = 0; n < dropdownLinks.length; n++) {
+      dropdownLinks[n].addEventListener('click', function () {
+        clearAccountCloseTimer();
+        setAccountMenuOpen(false);
+      });
+    }
+
+    document.addEventListener('click', closeAccountMenu);
+    document.addEventListener('keydown', closeAccountMenuOnEscape);
+    window.accountMenuCleanup = function () {
+      clearAccountCloseTimer();
+      document.removeEventListener('click', closeAccountMenu);
+      document.removeEventListener('keydown', closeAccountMenuOnEscape);
+    };
   }
 
   // ==== Hamburger Menu Toggle ====

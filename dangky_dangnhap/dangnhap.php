@@ -2,19 +2,9 @@
 session_start();
 require_once 'config.php';
 
-function resolve_redirect_target(?string $key): string
-{
-    $routes = [
-        'checkout' => '../thanhtoan/thanhtoan.php',
-        'home' => '../trangchu/index.php',
-        'profile' => 'ho_so.php',
-    ];
-
-    return $routes[$key] ?? 'ho_so.php';
-}
-
-$redirectKey = $_POST['redirect'] ?? $_GET['redirect'] ?? 'profile';
-$redirectTarget = resolve_redirect_target($redirectKey);
+$redirectKey = normalize_auth_redirect_key($_POST['redirect'] ?? $_GET['redirect'] ?? 'profile');
+$redirectTarget = resolve_auth_redirect_target($redirectKey);
+$registerUrl = build_auth_page_url('dangky.php', $redirectKey);
 
 if (!empty($_SESSION['user_id'])) {
     header('Location: ' . $redirectTarget);
@@ -24,7 +14,7 @@ if (!empty($_SESSION['user_id'])) {
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
+    $email = normalize_user_email($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if ($email === '' || $password === '') {
@@ -39,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
-        if ($user && password_verify($password, $user['mat_khau'])) {
+        if ($user && verify_and_upgrade_user_password($conn, $user, $password)) {
+            session_regenerate_id(true);
             $_SESSION['user_id'] = (int) $user['id'];
             $_SESSION['user_name'] = $user['ho_ten'];
             $_SESSION['user_email'] = $user['email'];
@@ -72,21 +63,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
-    <link rel="stylesheet" href="../mainfont/main.css" />
+    <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
     <link rel="stylesheet" href="dangky_dangnhap.css" />
 </head>
 
 <body data-page="login">
     <nav class="navigation" id="main-nav"></nav>
-    <script defer src="../mainfont/layout.js"></script>
-    <script defer src="../mainfont/main.js"></script>
+    <script defer src="../mainfont/layout.js?v=20260318-2"></script>
+    <script defer src="../mainfont/main.js?v=20260318-2"></script>
 
     <main class="body__main body__main__login">
         <div class="auth-form">
             <div class="auth-form__container">
                 <div class="auth-form__header">
                     <h3 class="auth-form__heading">Đăng nhập</h3>
-                    <a href="dangky.php" class="auth-form__switch-btn">Đăng ký</a>
+                    <a href="<?= htmlspecialchars($registerUrl) ?>" class="auth-form__switch-btn">Đăng ký</a>
                 </div>
 
                 <?php if ($message !== ''): ?>
@@ -103,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="email" class="form-label">Email</label>
                             <input id="email" name="email" type="email" class="auth-form__input"
                                 placeholder="Nhập email của bạn" required
-                                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" />
+                                value="<?= htmlspecialchars(normalize_user_email($_POST['email'] ?? '')) ?>" />
                             <small id="feedback-email" class="form-message"></small>
                         </div>
 

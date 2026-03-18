@@ -116,6 +116,8 @@ body>*:not(.navigation):not(script):not(footer) {
   display: flex;
   gap: 20px;
   list-style: none;
+  position: relative;
+  z-index: 2;
 }
 
 /* Các mục menu */
@@ -214,6 +216,7 @@ body>*:not(.navigation):not(script):not(footer) {
   -moz-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
   transform: translateX(-50%);
+  z-index: 1;
 }
 
 .nav-logo img {
@@ -243,6 +246,19 @@ body>*:not(.navigation):not(script):not(footer) {
 /* LOGIN */
 .login-container {
   position: relative;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+}
+
+.login-container::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 170px;
+  height: 18px;
+  pointer-events: none;
 }
 
 .login-trigger {
@@ -252,33 +268,45 @@ body>*:not(.navigation):not(script):not(footer) {
   cursor: pointer;
   padding: 10px 8px;
   color: #444;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: 0.3s;
 }
 
-.login-trigger:hover {
+.login-trigger:hover,
+.login-trigger:focus-visible,
+.login-container.active .login-trigger,
+.login-container:focus-within .login-trigger {
   color: #54794a;
+}
+
+.login-trigger:focus-visible {
+  outline: 2px solid rgba(84, 121, 74, 0.35);
+  outline-offset: 4px;
+  border-radius: 10px;
 }
 
 /* DROPDOWN */
 .login-dropdown {
   position: absolute;
-  top: 100%;
-  margin-top: 20px;
-  /* cách icon **px */
+  top: calc(100% + 6px);
   right: 0;
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  display: flex;
+  display: none;
   flex-direction: column;
   min-width: 150px;
   z-index: 1001;
-
-  /* Hiệu ứng ẩn/hiện */
-  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  overflow: hidden;
+  transition: transform 0.18s ease, visibility 0s linear 0.18s;
 }
 
 /* Liên kết trong dropdown */
@@ -287,19 +315,27 @@ body>*:not(.navigation):not(script):not(footer) {
   text-decoration: none;
   color: #444;
   font-size: 14px;
+  background-color: #fff;
+  touch-action: manipulation;
   transition: background 0.3s, color 0.3s;
   border-radius: 6px;
 }
 
-.login-dropdown a:hover {
+.login-dropdown a:hover,
+.login-dropdown a:focus-visible {
   background-color: #54794a;
   color: white;
 }
 
 /* Lớp active để điều khiển bằng JS */
-.login-container.active .login-dropdown {
-  opacity: 1;
+.login-container:hover .login-dropdown,
+.login-container.active .login-dropdown,
+.login-container:focus-within .login-dropdown {
+  display: flex;
+  visibility: visible;
+  transform: translateY(0);
   pointer-events: auto;
+  transition-delay: 0s;
 }
 
 /* Tablet: chỉ thu nhỏ, không thay đổi layout */
@@ -577,7 +613,8 @@ body>*:not(.navigation):not(script):not(footer) {
     left: auto;
     min-width: 150px;
     max-width: calc(100vw - 20px);
-    margin-top: 0;
+    transform: translateY(0);
+    transition: none;
   }
 
   /* Footer responsive mobile */

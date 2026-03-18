@@ -20,15 +20,15 @@ $products = $stmt->fetchAll();
   <link rel="icon" href="../images/avatar.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="sanpham.css" />
-  <link rel="stylesheet" href="../mainfont/main.css" />
+    <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
 
 <body data-page="products">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js"></script>
-  <script defer src="../mainfont/main.js"></script>
+    <script defer src="../mainfont/layout.js?v=20260318-2"></script>
+    <script defer src="../mainfont/main.js?v=20260318-2"></script>
 
   <div class="page-header">
     <h1>Tất cả sản phẩm</h1>

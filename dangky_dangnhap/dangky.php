@@ -2,8 +2,12 @@
 session_start();
 require_once 'config.php';
 
+$redirectKey = normalize_auth_redirect_key($_POST['redirect'] ?? $_GET['redirect'] ?? 'profile');
+$redirectTarget = resolve_auth_redirect_target($redirectKey);
+$loginUrl = build_auth_page_url('dangnhap.php', $redirectKey);
+
 if (!empty($_SESSION['user_id'])) {
-    header('Location: ho_so.php');
+    header('Location: ' . $redirectTarget);
     exit;
 }
 
@@ -11,7 +15,7 @@ $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
+    $email = normalize_user_email($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
 
@@ -31,18 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = 'Email này đã được sử dụng.';
         } else {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("
-                INSERT INTO users (ho_ten, email, mat_khau, vai_tro)
-                VALUES (?, ?, ?, 'khach')
-            ");
-
-            if ($stmt->execute([$name, $email, $hashedPassword])) {
+            if (create_user_account($conn, $name, $email, $hashedPassword, 'khach')) {
+                session_regenerate_id(true);
                 $_SESSION['user_id'] = (int) $conn->lastInsertId();
                 $_SESSION['user_name'] = $name;
                 $_SESSION['user_email'] = $email;
                 $_SESSION['user_role'] = 'khach';
 
-                header('Location: ho_so.php');
+                header('Location: ' . $redirectTarget);
                 exit;
             }
 
@@ -70,21 +70,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
-    <link rel="stylesheet" href="../mainfont/main.css" />
+    <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
     <link rel="stylesheet" href="dangky_dangnhap.css" />
 </head>
 
 <body data-page="login">
     <nav class="navigation" id="main-nav"></nav>
-    <script defer src="../mainfont/layout.js"></script>
-    <script defer src="../mainfont/main.js"></script>
+    <script defer src="../mainfont/layout.js?v=20260318-2"></script>
+    <script defer src="../mainfont/main.js?v=20260318-2"></script>
 
     <main class="body__main body__main__logout">
         <div class="auth-form">
             <div class="auth-form__container">
                 <div class="auth-form__header">
                     <h3 class="auth-form__heading">Đăng ký</h3>
-                    <a href="dangnhap.php" class="auth-form__switch-btn">Đăng nhập</a>
+                    <a href="<?= htmlspecialchars($loginUrl) ?>" class="auth-form__switch-btn">Đăng nhập</a>
                 </div>
 
                 <?php if ($message !== ''): ?>
@@ -94,6 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
 
                 <form id="registerForm" method="POST" action="dangky.php">
+                    <input type="hidden" name="redirect" value="<?= htmlspecialchars($redirectKey) ?>">
+
                     <div class="auth-form__form">
                         <div class="auth-form__group">
                             <label for="name" class="form-label">Họ và tên</label>
@@ -107,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="email" class="form-label">Email</label>
                             <input id="email" name="email" type="email" class="auth-form__input"
                                 placeholder="VD: email@domain.com" required
-                                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" />
+                                value="<?= htmlspecialchars(normalize_user_email($_POST['email'] ?? '')) ?>" />
                             <small id="feedback-email" class="form-message"></small>
                         </div>
 

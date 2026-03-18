@@ -57,14 +57,14 @@ $mainImageUrl = '../' . $mainImagePath;
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../mainfont/main.css" />
+    <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
   <link rel="stylesheet" href="./spchitiet.css?v=20260316-2">
 </head>
 
 <body data-page="products">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js"></script>
-  <script defer src="../mainfont/main.js"></script>
+    <script defer src="../mainfont/layout.js?v=20260318-2"></script>
+    <script defer src="../mainfont/main.js?v=20260318-2"></script>
 
   <div class="container">
     <h2 class="product_title" id="product-title"><?= htmlspecialchars($product['ten_sp']) ?></h2>
@@ -157,7 +157,7 @@ $mainImageUrl = '../' . $mainImagePath;
     </div>
   </div>
 
-  <script src="../giohang/giohang.js"></script>
+  <script src="../giohang/giohang.js?v=20260318-2"></script>
   <script>
     function changeImage(src) {
       document.getElementById('main-image').src = src;
@@ -182,7 +182,6 @@ $mainImageUrl = '../' . $mainImagePath;
         quantity: qty,
         image: <?= json_encode($mainImagePath) ?>
       });
-      window.location.href = '../giohang/giohang.html';
     }
   </script>
 

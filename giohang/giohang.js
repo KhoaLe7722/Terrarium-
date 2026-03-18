@@ -6,6 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const checkoutButton = document.querySelector(".checkout-btn");
   const checkoutLink = checkoutButton ? checkoutButton.closest("a") : null;
   const fallbackImage = "../images/avatar.png";
+  const storeUrls = {
+    cart: new URL("../giohang/giohang.html", window.location.href).href,
+    login: new URL("../dangky_dangnhap/dangnhap.php", window.location.href).href,
+    register: new URL("../dangky_dangnhap/dangky.php", window.location.href).href,
+    session: new URL("../dangky_dangnhap/check_session.php", window.location.href).href,
+  };
+  let sessionCache = null;
+  let dialogElements = null;
   const productOverrides = {
     1: { name: "Bình Trứng Mini", image: "sanpham/image_sanpham/Bình trứng Mini/1.jpg" },
     2: { name: "Terrarium Bình Trụ 14x9", image: "sanpham/image_sanpham/Terrarium bình trụ 14x9 (2)/1.jpg" },
@@ -16,6 +24,227 @@ document.addEventListener("DOMContentLoaded", () => {
     7: { name: "Terrarium Đa Giác 23x23x40", image: "sanpham/image_sanpham/Terrarium Đa Giác 23x23x40/1.jpg" },
     8: { name: "Đèn LED Đế Gỗ Terrarium", image: "sanpham/image_sanpham/Đèn.jpg" }
   };
+
+  function ensureStoreDialog() {
+    if (dialogElements) {
+      return dialogElements;
+    }
+
+    const styleId = "store-action-dialog-style";
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement("style");
+      style.id = styleId;
+      style.textContent = `
+        .store-dialog-overlay {
+          position: fixed;
+          inset: 0;
+          display: none;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          background: rgba(26, 36, 21, 0.45);
+          z-index: 3000;
+        }
+        .store-dialog-overlay.is-open {
+          display: flex;
+        }
+        .store-dialog {
+          width: min(100%, 420px);
+          background: #ffffff;
+          border-radius: 18px;
+          border: 1px solid #dbe7d5;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+          padding: 24px 22px 20px;
+          color: #23311f;
+          position: relative;
+        }
+        .store-dialog__close {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          width: 34px;
+          height: 34px;
+          border: 0;
+          background: transparent;
+          color: #6b7280;
+          font-size: 22px;
+          cursor: pointer;
+        }
+        .store-dialog__title {
+          margin: 0 34px 10px 0;
+          font-size: 24px;
+          line-height: 1.2;
+          color: #2f4f29;
+        }
+        .store-dialog__message {
+          margin: 0;
+          font-size: 15px;
+          line-height: 1.65;
+          color: #4b5563;
+        }
+        .store-dialog__actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 20px;
+        }
+        .store-dialog__btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 130px;
+          min-height: 42px;
+          padding: 10px 16px;
+          border-radius: 999px;
+          border: 1px solid #54794a;
+          background: #54794a;
+          color: #fff;
+          text-decoration: none;
+          font-weight: 700;
+          cursor: pointer;
+          transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+        }
+        .store-dialog__btn:hover {
+          transform: translateY(-1px);
+          opacity: 0.95;
+        }
+        .store-dialog__btn.is-secondary {
+          background: #fff;
+          color: #54794a;
+          border-color: #c7d7c1;
+        }
+        @media (max-width: 480px) {
+          .store-dialog {
+            padding: 22px 18px 18px;
+            border-radius: 16px;
+          }
+          .store-dialog__actions {
+            flex-direction: column;
+          }
+          .store-dialog__btn {
+            width: 100%;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const overlay = document.createElement("div");
+    overlay.className = "store-dialog-overlay";
+    overlay.innerHTML = `
+      <div class="store-dialog" role="dialog" aria-modal="true" aria-labelledby="store-dialog-title">
+        <button type="button" class="store-dialog__close" aria-label="Đóng">&times;</button>
+        <h3 class="store-dialog__title" id="store-dialog-title"></h3>
+        <p class="store-dialog__message"></p>
+        <div class="store-dialog__actions"></div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const actionsEl = overlay.querySelector(".store-dialog__actions");
+
+    function closeDialog() {
+      overlay.classList.remove("is-open");
+      actionsEl.innerHTML = "";
+    }
+
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) {
+        closeDialog();
+      }
+    });
+
+    overlay.querySelector(".store-dialog__close").addEventListener("click", closeDialog);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && overlay.classList.contains("is-open")) {
+        closeDialog();
+      }
+    });
+
+    dialogElements = {
+      overlay,
+      titleEl: overlay.querySelector(".store-dialog__title"),
+      messageEl: overlay.querySelector(".store-dialog__message"),
+      actionsEl,
+      closeDialog,
+    };
+
+    return dialogElements;
+  }
+
+  function showStoreDialog(options) {
+    const dialog = ensureStoreDialog();
+    dialog.titleEl.textContent = options.title;
+    dialog.messageEl.textContent = options.message;
+    dialog.actionsEl.innerHTML = "";
+
+    (options.actions || []).forEach((action) => {
+      const element = action.href ? document.createElement("a") : document.createElement("button");
+
+      if (action.href) {
+        element.href = action.href;
+      } else {
+        element.type = "button";
+      }
+
+      element.className = "store-dialog__btn" + (action.secondary ? " is-secondary" : "");
+      element.textContent = action.label;
+      element.addEventListener("click", () => {
+        if (typeof action.onClick === "function") {
+          action.onClick();
+        }
+
+        if (!action.keepOpen) {
+          dialog.closeDialog();
+        }
+      });
+
+      dialog.actionsEl.appendChild(element);
+    });
+
+    dialog.overlay.classList.add("is-open");
+  }
+
+  function fetchSessionState(forceRefresh) {
+    if (!forceRefresh && sessionCache) {
+      return Promise.resolve(sessionCache);
+    }
+
+    return fetch(storeUrls.session, { credentials: "same-origin" })
+      .then((response) => response.json())
+      .then((data) => {
+        sessionCache = data;
+        return data;
+      })
+      .catch(() => {
+        sessionCache = { loggedIn: false };
+        return sessionCache;
+      });
+  }
+
+  function showLoginRequiredDialog() {
+    showStoreDialog({
+      title: "Mời bạn đăng nhập",
+      message: "Mời bạn đăng nhập hoặc tạo tài khoản để mua hàng.",
+      actions: [
+        { label: "Đăng nhập", href: storeUrls.login },
+        { label: "Tạo tài khoản", href: storeUrls.register, secondary: true },
+      ],
+    });
+  }
+
+  function showAddedToCartDialog() {
+    showStoreDialog({
+      title: "Đã thêm vào giỏ hàng",
+      message: "Sản phẩm đã được thêm vào giỏ hàng của bạn.",
+      actions: [
+        { label: "Xem giỏ hàng", href: storeUrls.cart },
+        { label: "Tiếp tục mua", secondary: true },
+      ],
+    });
+  }
 
   function normalizeCartItem(item) {
     const normalizedId = Number(item.id);
@@ -169,22 +398,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   window.addToCart = function (product) {
-    const nextProduct = normalizeCartItem(product);
-    const cart = getCart();
-    const existingIndex = cart.findIndex((item) => Number(item.id) === Number(nextProduct.id));
+    return fetchSessionState(true).then((sessionState) => {
+      if (!sessionState.loggedIn) {
+        showLoginRequiredDialog();
+        return false;
+      }
 
-    if (existingIndex !== -1) {
-      cart[existingIndex].quantity += Number(nextProduct.quantity) || 1;
-    } else {
-      cart.push(nextProduct);
-    }
+      const nextProduct = normalizeCartItem(product);
+      const cart = getCart();
+      const existingIndex = cart.findIndex((item) => Number(item.id) === Number(nextProduct.id));
 
-    saveCart(cart);
-    renderCart();
+      if (existingIndex !== -1) {
+        cart[existingIndex].quantity += Number(nextProduct.quantity) || 1;
+      } else {
+        cart.push(nextProduct);
+      }
 
-    if (cartPopup) {
-      showCart();
-    }
+      saveCart(cart);
+      renderCart();
+      hideCart();
+      showAddedToCartDialog();
+
+      return true;
+    });
   };
 
   let hideTimer;

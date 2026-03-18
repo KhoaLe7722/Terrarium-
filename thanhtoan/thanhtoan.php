@@ -34,7 +34,7 @@ if (!$user) {
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../mainfont/main.css" />
+  <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
   <link rel="stylesheet" href="thanhtoan.css" />
   <style>
       .checkout-form {
@@ -127,8 +127,8 @@ if (!$user) {
 
 <body data-page="checkout">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js"></script>
-  <script defer src="../mainfont/main.js"></script>
+  <script defer src="../mainfont/layout.js?v=20260318-2"></script>
+  <script defer src="../mainfont/main.js?v=20260318-2"></script>
 
   <div class="container">
       <div id="checkout-section" class="checkout-form">

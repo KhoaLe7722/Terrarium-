@@ -46,7 +46,7 @@ $orders = $stmt->fetchAll();
     <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../mainfont/main.css" />
+    <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
     <link rel="stylesheet" href="ho_so.css" />
     <style>
         .profile-info {
@@ -130,8 +130,8 @@ $orders = $stmt->fetchAll();
 
 <body data-page="profile">
     <nav class="navigation" id="main-nav"></nav>
-    <script defer src="../mainfont/layout.js"></script>
-    <script defer src="../mainfont/main.js"></script>
+    <script defer src="../mainfont/layout.js?v=20260318-2"></script>
+    <script defer src="../mainfont/main.js?v=20260318-2"></script>
 
     <main class="body__main" style="margin-top: 30px; min-height: 60vh;">
         <div class="profile-container">
@@ -240,7 +240,7 @@ $orders = $stmt->fetchAll();
 
     <footer class="site-footer" id="site-footer"></footer>
 
-    <script src="../giohang/giohang.js"></script>
+    <script src="../giohang/giohang.js?v=20260318-2"></script>
     <script>
         function formatPrice(value) {
             return Number(value).toLocaleString('vi-VN') + 'đ';
