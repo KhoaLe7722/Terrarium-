@@ -34,10 +34,11 @@ $displayGallery = in_array($id, [5, 6], true)
 $suggestionExcludeId = in_array($id, [5, 6], true) ? 1 : $id;
 $suggestions = load_latest_products($conn, 3, $suggestionExcludeId);
 
-$price = (float) $product['gia'];
-$originalPrice = (float) ($product['gia_goc'] ?: $product['gia']);
-$isSale = $originalPrice > $price;
-$discountPercent = $isSale ? (int) round((($originalPrice - $price) / $originalPrice) * 100) : 0;
+$pricing = get_product_pricing($product);
+$price = $pricing['price'];
+$originalPrice = $pricing['original_price'];
+$isSale = $pricing['is_sale'];
+$discountPercent = $pricing['discount_percent'];
 $isInStock = ($product['tinh_trang'] ?? 'con_hang') === 'con_hang';
 $mainImagePath = public_asset_path($product['hinh_chinh']);
 $mainImageUrl = '../' . $mainImagePath;
@@ -129,9 +130,13 @@ $mainImageUrl = '../' . $mainImagePath;
         <?php if (!empty($suggestions)): ?>
           <div class="product-suggestion-grid">
             <?php foreach ($suggestions as $suggestion): ?>
+              <?php $suggestionPricing = get_product_pricing($suggestion); ?>
               <div class="suggestion-card">
                 <a href="spchitiet.html?id=<?= (int) $suggestion['id'] ?>" class="suggestion-link">
                   <div class="suggestion-image-wrap">
+                    <?php if ($suggestionPricing['is_sale']): ?>
+                      <span class="suggestion-sale-badge">-<?= (int) $suggestionPricing['discount_percent'] ?>%</span>
+                    <?php endif; ?>
                     <img
                       src="<?= htmlspecialchars(normalize_public_path($suggestion['hinh_chinh'])) ?>"
                       alt="<?= htmlspecialchars($suggestion['ten_sp']) ?>"
@@ -140,7 +145,12 @@ $mainImageUrl = '../' . $mainImagePath;
                   </div>
                   <div class="suggestion-content">
                     <div class="suggestion-title"><?= htmlspecialchars($suggestion['ten_sp']) ?></div>
-                    <div class="suggestion-price"><?= htmlspecialchars(format_currency_vnd($suggestion['gia'])) ?></div>
+                    <div class="suggestion-price">
+                      <span class="suggestion-price-current"><?= htmlspecialchars(format_currency_vnd($suggestionPricing['price'])) ?></span>
+                      <?php if ($suggestionPricing['is_sale']): ?>
+                        <span class="suggestion-price-old"><?= htmlspecialchars(format_currency_vnd($suggestionPricing['original_price'])) ?></span>
+                      <?php endif; ?>
+                    </div>
                   </div>
                 </a>
               </div>
@@ -189,3 +199,4 @@ $mainImageUrl = '../' . $mainImagePath;
 </body>
 
 </html>
+

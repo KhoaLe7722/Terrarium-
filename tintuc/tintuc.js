@@ -1,22 +1,5 @@
 const tintuc = [
     {
-        id: 1,
-        tieude: "Bán 60 gốc mai vàng",
-        image: "img__tintuc/1.jpg",
-        url: "detail.html?id=1",
-        pre: "Bán 60 gốc mai ",
-        luotxem: ""
-    },
-    {
-        id: 2,
-        tieude: "Cây kiểng phát tài: Mai vàng, cây cảnh Tết",
-        image: "img__tintuc/2.jpg",
-        url: "detail.html?id=2",
-        pre: "Mai vàng và cây cảnh Tết",
-        noidung: "Cây kiểng, đặc biệt là mai vàng, đã trở thành một phần không thể thiếu trong dịp Tết Nguyên Đán. Chúng không chỉ có giá trị thẩm mỹ mà còn mang ý nghĩa phong thủy, mang lại tài lộc, may mắn cho gia đình trong năm mới.",
-        luotxem: ""
-    },
-    {
         id: 3,
         tieude: "Cây cảnh – Tài sản quý giá cho thế hệ sau",
         image: "img__tintuc/3.jpg",

@@ -1,0 +1,6 @@
+.git
+.chrome-headless
+.vscode
+backup_php
+*.log
+.DS_Store

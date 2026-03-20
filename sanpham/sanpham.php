@@ -3,7 +3,7 @@ require_once '../dangky_dangnhap/config.php';
 require_once '../includes/store_helpers.php';
 
 $stmt = $conn->query("
-    SELECT id, ten_sp, gia, hinh_chinh
+    SELECT id, ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh
     FROM products
     WHERE tinh_trang = 'con_hang'
     ORDER BY id ASC
@@ -62,9 +62,13 @@ $products = $stmt->fetchAll();
             </div>
           <?php else: ?>
             <?php foreach ($products as $product): ?>
-              <div class="product-card" data-price="<?= htmlspecialchars((string) $product['gia']) ?>">
+              <?php $pricing = get_product_pricing($product); ?>
+              <div class="product-card" data-price="<?= htmlspecialchars((string) $pricing['price']) ?>">
                 <a href="spchitiet.html?id=<?= (int) $product['id'] ?>" class="product-link">
                   <div class="product-image-container">
+                    <?php if ($pricing['is_sale']): ?>
+                      <span class="sale-badge">-<?= (int) $pricing['discount_percent'] ?>%</span>
+                    <?php endif; ?>
                     <img
                       class="product-image"
                       src="<?= htmlspecialchars(normalize_public_path($product['hinh_chinh'])) ?>"
@@ -74,7 +78,12 @@ $products = $stmt->fetchAll();
                 </a>
                 <div class="product-content">
                   <div class="product-title"><?= htmlspecialchars($product['ten_sp']) ?></div>
-                  <div class="product-price"><?= htmlspecialchars(format_currency_vnd($product['gia'])) ?></div>
+                  <div class="product-price">
+                    <span class="current-price"><?= htmlspecialchars(format_currency_vnd($pricing['price'])) ?></span>
+                    <?php if ($pricing['is_sale']): ?>
+                      <span class="old-price"><?= htmlspecialchars(format_currency_vnd($pricing['original_price'])) ?></span>
+                    <?php endif; ?>
+                  </div>
                 </div>
               </div>
             <?php endforeach; ?>
@@ -113,3 +122,5 @@ $products = $stmt->fetchAll();
 </body>
 
 </html>
+
+

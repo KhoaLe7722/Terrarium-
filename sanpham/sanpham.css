@@ -1,4 +1,4 @@
-/* ==== BỐ CỤC CHUNG ==== */
+/* ==== Bá» Cá»¤C CHUNG ==== */
 
 .grid-layout {
   display: grid;
@@ -9,7 +9,7 @@
   padding: 20px 20px 60px;
 }
 
-/* ==== SẢN PHẨM ==== */
+/* ==== Sáº¢N PHáº¨M ==== */
 
 .product-section {
   padding: 0;
@@ -48,13 +48,20 @@
 
 .product-link {
   display: block;
-  position: relative;
   height: 250px;
+}
+
+.product-image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+  background: linear-gradient(180deg, #f8fbf4 0%, #ffffff 100%);
 }
 
 .product-image {
   width: auto !important;
+  max-width: 100%;
   max-height: 100%;
   position: absolute;
   top: 0;
@@ -86,37 +93,49 @@
 }
 
 .product-price {
-  color: #54794a;
-  font-size: 16px;
-  font-weight: bold;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
   text-align: center;
 }
 
+.current-price {
+  color: #2c6d31;
+  font-size: 18px;
+  font-weight: 700;
+}
+
 .old-price {
-    color: #999;
-    text-decoration: line-through;
-    font-size: 14px;
-    margin-right: 5px;
-    font-weight: normal;
+  color: #999;
+  text-decoration: line-through;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 /* Sale Badge */
 .sale-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #ff4747;
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: bold;
-    z-index: 10;
-    box-shadow: 0 2px 5px rgba(255, 71, 71, 0.3);
-    font-family: 'Dosis', sans-serif;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff4d4f 0%, #c81e1e 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  z-index: 10;
+  box-shadow: 0 12px 22px rgba(200, 30, 30, 0.26);
+  font-family: 'Dosis', sans-serif;
 }
 
-/* ==== BỘ LỌC SẢN PHẨM ==== */
+/* ==== Bá»˜ Lá»ŒC Sáº¢N PHáº¨M ==== */
 
 .filter-sidebar {
   background-color: #e7f8e5;
@@ -185,7 +204,7 @@
   margin-top: 10px;
   font-family: 'Dosis', sans-serif;
   text-align: center;
-  /* Canh giữa toàn bộ nội dung */
+  /* Canh giá»¯a toÃ n bá»™ ná»™i dung */
 }
 
 .nd-main-title-breadcrumb {
@@ -196,7 +215,7 @@
   line-height: 1.4;
 }
 
-/* === DANH MỤC ĐƯỜNG DẪN === */
+/* === DANH Má»¤C ÄÆ¯á»œNG DáºªN === */
 /*.breadcrumb {
   list-style: none;
   padding: 0;
@@ -222,7 +241,7 @@
 }
 
 .breadcrumb li:last-child::after {
-  content: "";  Bỏ dấu "/" cuối cùng 
+  content: "";  Bá» dáº¥u "/" cuá»‘i cÃ¹ng 
 } 
 
 .breadcrumb a {
@@ -279,10 +298,24 @@
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .sale-badge {
+    min-width: 50px;
+    padding: 7px 10px;
+    font-size: 13px;
+  }
 }
 
 @media screen and (max-width: 480px) {
   .product-grid {
     grid-template-columns: 1fr;
   }
+
+  .product-content {
+    padding: 14px 16px 18px;
+  }
 }
+
+
+
+

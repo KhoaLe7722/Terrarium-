@@ -2,51 +2,6 @@ const url = new URLSearchParams(window.location.search);
 const articleId = url.get('id');
 const tintuc = [
     {
-        id: 1,
-        tieude: "Bán 60 gốc mai vàng 'có sẵn ngoài vườn' thu về 3 tỷ đồng",
-        image: "img__tintuc/1.jpg",
-        url: "detail.html?id=1",
-        noidung: {
-            content1: "Cha mẹ tôi, gốc nông dân Tiền Giang, đã phá vườn cây ăn trái để trồng hơn trăm gốc mai vàng từ cây có sẵn. Vài năm qua, nhà tôi bán những cây mai vàng có hoành 70-80 cm với giá từ 110 triệu đồng mỗi gốc. Trước Tết, một nhà vườn mua 60 gốc với giá gần 3 tỷ đồng để ghép mai vàng giao Thủ Đức. Gia đình tôi chuyển hướng từ làm ruộng, vườn sang trồng mai vàng làm, giống như gia đình trong bài viết trước, bán cây mai vàng để quên ngoài sân với số tiền lớn. Mai vàng không chỉ là cây kiểng mà còn là tài sản giá trị của người nông dân.",
-            content__box: [
-                {
-                    content: `Vài năm lại đây nhà bán lẻ ra những cây có hoành (chu vi gốc cây) 70-80 cm trở lên với giá tiền từ 110 triệu đồng một gốc trở lên. Trước Tết này có anh nhà vườn chuyên nghiệp mua hẳn 60 gốc với giá gần 3 tỷ để về họ ghép mai vàng giao Thủ Đức.
-                    <br>Cận Tết năm nay, không khí mua bán trong giới nhà vườn càng trở nên nhộn nhịp hơn khi có một chủ vườn chuyên nghiệp đã “xuống tiền” mạnh tay: mua liền lúc 60 gốc cây có hoành lớn với tổng giá trị gần 3 tỷ đồng. Theo chia sẻ, toàn bộ số gốc này được ông thu mua từ các tỉnh miền Tây, sau đó vận chuyển về khu vực Thủ Đức để ghép giống mai vàng — chuẩn bị phục vụ thị trường Tết sắp tới.
-                    <br> Trong vài năm trở lại đây, thị trường cây cảnh, đặc biệt là mai vàng ghép, đã chứng kiến sự trỗi dậy mạnh mẽ của phân khúc cao cấp. Các nhà vườn và nhà bán lẻ ngày càng đưa ra những gốc cây có hoành lớn (chu vi gốc từ 70 đến 80 cm trở lên), được săn đón như những tác phẩm nghệ thuật thực thụ. Giá trị của những gốc mai dạng này không hề nhỏ — mỗi cây thường được niêm yết từ 110 triệu đồng trở lên, tùy vào thế dáng, độ tuổi và chất lượng gốc.`,
-                    img: "img__tintuc/1a.jpg"
-                },
-                {
-                    content: "Độc giả nickname Lanh Chanh nhận định: 'Mai thường 5 cánh to, tàng đẹp, có giá vài chục triệu là bình thường, cụ mai lão mai vài trăm, cả tỷ thì hơi hiếm. Nhưng năm nay không biết mọi nơi ra sao, chứ nơi tôi ở mai rẻ quá. Tôi mua một cặp bầu đất cao 1,5-1,8m hoành gốc 20-22 cm (đã nhú nụ nhưng hơi ít bông) mà giá chỉ 600 nghìn đồng, lại còn chở tới tận nhà (4 km). Bán giá này thì lấy gì lời, tôi thấy tội quá cho thêm 100 nghìn đồng'.",
-                    img: "img__tintuc/1b.jpg"
-                },
-            ],
-        },
-    },
-
-    {
-        id: 2,
-        tieude: "Cây kiểng phát tài: Mai vàng, cây cảnh Tết",
-        image: "img__tintuc/2.jpg",
-        url: "detail.html?id=2",
-        noidung: {
-            content1: "Cây kiểng, đặc biệt là mai vàng, đã trở thành một phần không thể thiếu trong dịp Tết Nguyên Đán. Chúng không chỉ có giá trị thẩm mỹ mà còn mang ý nghĩa phong thủy, mang lại tài lộc, may mắn cho gia đình trong năm mới.",
-            content__box: [
-                {
-                    content: `Tết đến xuân về, không thể thiếu hình ảnh những chậu mai vàng rực rỡ, bonsai dáng thế uốn lượn, hay cây kiểng cổ thụ được chăm chút tỉ mỉ. Trong văn hóa Việt, cây cảnh ngày Tết không chỉ để trang trí cho đẹp nhà, đẹp sân, mà còn mang ý nghĩa phong thủy sâu sắc: cầu tài lộc, bình an và khởi đầu một năm mới hanh thông.
-
-<br>Trong đó, mai vàng luôn được xem là biểu tượng may mắn của người miền Nam. Một cây mai đẹp, nở đúng Tết với cánh hoa vàng óng, đều được ví như "vàng sống" trong nhà. Không ít người sẵn sàng chi hàng chục đến hàng trăm triệu đồng để sở hữu những gốc mai cổ, mai ghép nghệ thuật có dáng thế đẹp và khả năng cho hoa đúng thời điểm.`,
-                    img: "img__tintuc/2a.jpg"
-                },
-                {
-                    content: `Song song với mai vàng, nhiều loại cây kiểng Tết khác như: tùng la hán, sung bonsai, lộc vừng, phát tài núi, linh sam, kim quýt… cũng được săn đón vì mang hình dáng đẹp, thế vững chắc và cái tên gắn với ý nghĩa tài lộc, trường thọ.
-
-Nắm bắt xu hướng đó, nhiều nhà vườn đã mạnh tay đầu tư, sưu tầm những gốc cây quý, ghép giống độc đáo, tạo hình nghệ thuật để phục vụ thị trường Tết. Các cây kiểng không chỉ là vật phẩm trang trí, mà còn trở thành món quà tặng giá trị, đẳng cấp trong dịp cuối năm.`,
-                    img: "img__tintuc/2b.jpg"
-                },
-            ],
-        },
-    },
-    {
         id: 3,
         tieude: "Cây cảnh – Tài sản quý giá cho thế hệ sau",
         image: "img__tintuc/3.jpg",
@@ -485,26 +440,29 @@ function displayLike() {
 displayLike();
 function loadPage(id) {
     const detail = tintuc.find(a => a.id === parseInt(id));
-    if (detail) {
-        document.getElementById('title').textContent = detail.tieude;
-        document.getElementById('img').src = detail.image;
-        document.getElementById('content').innerHTML = detail.noidung.content1;
+    if (!detail) {
+        window.location.replace("tintuc.html");
+        return;
+    }
 
-        const n = detail.noidung.content__box.length;
-        for (let i = 0; i < n; i++) {
-            const image = document.createElement("img");
-            image.src = detail.noidung.content__box[i].img;
-            image.id = `img${i}`;
-            image.alt = "Hinh anh"
-            image.classList.add("imgs");
-            const content = document.createElement("p");
+    document.getElementById('title').textContent = detail.tieude;
+    document.getElementById('img').src = detail.image;
+    document.getElementById('content').innerHTML = detail.noidung.content1;
 
-            content.innerHTML = detail.noidung.content__box[i].content;
-            content.id = `content${i}`;
-            content.classList.add("contents");
-            document.getElementById("thechua").appendChild(image);
-            document.getElementById("thechua").appendChild(content);
-        }
+    const n = detail.noidung.content__box.length;
+    for (let i = 0; i < n; i++) {
+        const image = document.createElement("img");
+        image.src = detail.noidung.content__box[i].img;
+        image.id = `img${i}`;
+        image.alt = "Hinh anh"
+        image.classList.add("imgs");
+        const content = document.createElement("p");
+
+        content.innerHTML = detail.noidung.content__box[i].content;
+        content.id = `content${i}`;
+        content.classList.add("contents");
+        document.getElementById("thechua").appendChild(image);
+        document.getElementById("thechua").appendChild(content);
     }
 }
 loadPage(articleId);

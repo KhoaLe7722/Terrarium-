@@ -79,7 +79,7 @@ body {
   box-shadow: 0 10px 18px rgba(84, 121, 74, 0.14);
 }
 
-/* Modal ảnh */
+/* Modal áº£nh */
 .modal {
   display: none;
   position: fixed;
@@ -150,15 +150,20 @@ body {
 .sale-badge {
     position: absolute;
     top: 20px;
-    right: 20px;
-    background-color: #ff4747;
+    left: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 62px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #ff4d4f 0%, #c81e1e 100%);
     color: #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 700;
+    line-height: 1;
     z-index: 10;
-    box-shadow: 0 4px 10px rgba(255, 71, 71, 0.4);
+    box-shadow: 0 12px 22px rgba(200, 30, 30, 0.26);
     font-family: 'Dosis', sans-serif;
 }
 
@@ -315,7 +320,7 @@ body {
 }
 
 .sidebar-widget li a::before {
-  content: "➤ ";
+  content: "âž¤ ";
   color: #554932;
   margin-right: 3px;
 
@@ -350,7 +355,7 @@ body {
 
 
 
-/* phần gợi ý thêm */
+/* pháº§n gá»£i Ã½ thÃªm */
 
 .product-suggestion-grid {
   display: grid;
@@ -416,9 +421,44 @@ body {
   line-height: 1.35;
 }
 
+.suggestion-sale-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff4d4f 0%, #c81e1e 100%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  z-index: 10;
+  box-shadow: 0 10px 18px rgba(200, 30, 30, 0.24);
+}
+
 .suggestion-price {
-  color: #54794a;
-  font-size: 16px;
-  font-weight: bold;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
   text-align: center;
 }
+
+.suggestion-price-current {
+  color: #2c6d31;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.suggestion-price-old {
+  color: #999;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: line-through;
+}
+

@@ -88,6 +88,40 @@ if (!function_exists('load_latest_products')) {
     }
 }
 
+if (!function_exists('get_product_pricing')) {
+    function get_product_pricing(array $product): array
+    {
+        $price = (float) ($product['gia'] ?? 0);
+        $originalPrice = (float) ($product['gia_goc'] ?? 0);
+        $discountPercent = (int) ($product['giam_gia_phan_tram'] ?? 0);
+
+        if ($originalPrice <= 0) {
+            $originalPrice = $price;
+        }
+
+        if ($originalPrice < $price) {
+            $originalPrice = $price;
+        }
+
+        if ($discountPercent <= 0 && $originalPrice > $price) {
+            $discountPercent = (int) round((($originalPrice - $price) / $originalPrice) * 100);
+        }
+
+        $isSale = $originalPrice > $price && $discountPercent > 0;
+
+        if (!$isSale) {
+            $originalPrice = $price;
+            $discountPercent = 0;
+        }
+
+        return [
+            'price' => $price,
+            'original_price' => $originalPrice,
+            'discount_percent' => $discountPercent,
+            'is_sale' => $isSale,
+        ];
+    }
+}
 if (!function_exists('load_product_gallery')) {
     function load_product_gallery(PDO $conn, int $productId): array
     {
@@ -102,3 +136,5 @@ if (!function_exists('load_product_gallery')) {
         return $stmt->fetchAll();
     }
 }
+
+

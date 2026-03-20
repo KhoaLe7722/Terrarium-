@@ -1,20 +1,57 @@
 <?php
+if (!function_exists('env_value')) {
+    function env_value(string $name, ?string $default = null, bool $allowEmpty = false): ?string
+    {
+        $value = getenv($name);
+
+        if ($value === false) {
+            return $default;
+        }
+
+        if (!$allowEmpty && $value === '') {
+            return $default;
+        }
+
+        return $value;
+    }
+}
+
 // Ket noi MySQL
-$host = 'localhost';
-$dbname = 'terrarium_db';
-$username = 'root';
-$password = ''; // Mac dinh XAMPP khong co mat khau
+$host = env_value('DB_HOST', 'localhost');
+$port = env_value('DB_PORT', '3306');
+$dbname = env_value('DB_NAME', 'terrarium_db');
+$username = env_value('DB_USERNAME', 'root');
+$password = env_value('DB_PASSWORD', '', true) ?? ''; // Mac dinh XAMPP khong co mat khau
+$rootUsername = env_value('DB_ROOT_USERNAME', $username);
+$rootPassword = env_value('DB_ROOT_PASSWORD', $password, true) ?? '';
+
+$serverDsn = "mysql:host=$host;port=$port;charset=utf8mb4";
+$databaseDsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
 
 try {
-    $serverConn = new PDO("mysql:host=$host;charset=utf8mb4", $username, $password);
-    $serverConn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $serverConn->exec("
-        CREATE DATABASE IF NOT EXISTS `$dbname`
-        CHARACTER SET utf8mb4
-        COLLATE utf8mb4_unicode_ci
-    ");
+    try {
+        $conn = new PDO($databaseDsn, $username, $password);
+    } catch (PDOException $databaseException) {
+        $errorInfo = $databaseException->errorInfo;
+        $mysqlErrorCode = is_array($errorInfo) ? (int) ($errorInfo[1] ?? 0) : 0;
+        $message = strtolower($databaseException->getMessage());
+        $isMissingDatabase = $mysqlErrorCode === 1049 || str_contains($message, 'unknown database');
 
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+        if (!$isMissingDatabase) {
+            throw $databaseException;
+        }
+
+        $serverConn = new PDO($serverDsn, $rootUsername, $rootPassword);
+        $serverConn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $serverConn->exec("
+            CREATE DATABASE IF NOT EXISTS `$dbname`
+            CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci
+        ");
+
+        $conn = new PDO($databaseDsn, $username, $password);
+    }
+
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
