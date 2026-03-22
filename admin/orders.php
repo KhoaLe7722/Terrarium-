@@ -5,7 +5,7 @@ $pageTitle = 'Đơn hàng';
 
 // Lấy danh sách đơn hàng lấy mới nhất
 $stmt = $conn->query("
-    SELECT o.id, o.ho_ten_kh, o.sdt_kh, o.dia_chi_giao, o.tong_tien, o.trang_thai, o.ngay_dat
+    SELECT o.id, o.ho_ten_kh, o.sdt_kh, o.dia_chi_giao, o.tong_tien, o.trang_thai, o.ngay_dat,o.phuong_thuc_tt
     FROM orders o
     ORDER BY o.ngay_dat DESC
 ");
@@ -22,6 +22,7 @@ $statuses = [
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,6 +32,7 @@ $statuses = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="admin.css">
 </head>
+
 <body>
 
     <?php include 'components/sidebar.php'; ?>
@@ -70,21 +72,24 @@ $statuses = [
                                                 <div style="font-weight: 500;"><?= htmlspecialchars($o['ho_ten_kh']) ?></div>
                                             </td>
                                             <td style="font-size: 13px;">
-                                                <div><i class="fas fa-phone fa-fw text-muted"></i> <?= htmlspecialchars($o['sdt_kh'] ?? 'Không có') ?></div>
-                                                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;" title="<?= htmlspecialchars($o['dia_chi_giao']) ?>">
-                                                    <i class="fas fa-map-marker-alt fa-fw text-muted"></i> <?= htmlspecialchars($o['dia_chi_giao']) ?>
+                                                <div><i class="fas fa-phone fa-fw text-muted"></i>
+                                                    <?= htmlspecialchars($o['sdt_kh'] ?? 'Không có') ?></div>
+                                                <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;"
+                                                    title="<?= htmlspecialchars($o['dia_chi_giao']) ?>">
+                                                    <i class="fas fa-map-marker-alt fa-fw text-muted"></i>
+                                                    <?= htmlspecialchars($o['dia_chi_giao']) ?>
                                                 </div>
                                             </td>
                                             <td>
-                                                <strong style="color:var(--danger);"><?= number_format($o['tong_tien'], 0, ',', '.') ?>đ</strong>
+                                                <strong
+                                                    style="color:var(--danger);"><?= number_format($o['tong_tien'], 0, ',', '.') ?>đ</strong>
                                             </td>
                                             <td style="font-size: 13px; color: var(--text-muted);">
                                                 <?= date('d/m/Y H:i', strtotime($o['ngay_dat'])) ?>
                                             </td>
                                             <td>
-                                                <select class="status-select" 
-                                                        data-order-id="<?= $o['id'] ?>" 
-                                                        onchange="updateOrderStatus(<?= $o['id'] ?>, this.value)">
+                                                <select class="status-select" data-order-id="<?= $o['id'] ?>"
+                                                    onchange="updateOrderStatus(<?= $o['id'] ?>, this.value)">
                                                     <?php foreach ($statuses as $val => $label): ?>
                                                         <option value="<?= $val ?>" <?= $o['trang_thai'] == $val ? 'selected' : '' ?>>
                                                             <?= $label ?>
@@ -110,4 +115,41 @@ $statuses = [
 
     <script src="admin.js"></script>
 </body>
+<script>
+    // Thêm vào file admin.js hoặc script nội tuyến
+    function updateOrderStatus(orderId, newStatus) {
+        if (!confirm("Bạn có chắc muốn cập nhật trạng thái đơn hàng #" + orderId + "?")) {
+            // Tải lại trang để reset select nếu admin ấn Hủy
+            window.location.reload();
+            return;
+        }
+
+        // Tạo đối tượng dữ liệu
+        const formData = new FormData();
+        formData.append('order_id', orderId);
+        formData.append('status', newStatus);
+
+        // Gửi request bằng fetch (Cần tạo file api_update_order.php)
+        fetch('api_update_order.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cập nhật trạng thái thành công!');
+                    // Tùy chọn: Đổi màu select box dựa theo trạng thái
+                } else {
+                    alert('Lỗi: ' + data.message);
+                    window.location.reload(); // Bị lỗi thì load lại
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi kết nối máy chủ.');
+                window.location.reload();
+            });
+    }
+</script>
+
 </html>
