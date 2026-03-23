@@ -14,40 +14,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
-  <link rel="stylesheet" href="giohangchitiet.css">
+  <link rel="stylesheet" href="giohangchitiet.css?v=20260322-17">
 </head>
 
 <body data-page="cart">
   <nav class="navigation" id="main-nav"></nav>
   <script defer src="../mainfont/layout.js?v=20260318-2"></script>
-  <script defer src="../mainfont/main.js?v=20260318-2"></script>
+  <script defer src="../mainfont/main.js?v=20260322-1"></script>
 
-  <div class="cart-popup" id="cart-popup">
-    <h3>Giỏ hàng của bạn</h3>
+  <main class="cart-container">
+    <section class="cart-card" id="cart-popup">
+      <h2 class="shop-title">Shop Terrarium</h2>
 
-    <table class="cart-table">
-      <thead>
-        <tr>
-          <th>Thông tin sản phẩm</th>
-          <th>Đơn giá</th>
-          <th>Số lượng</th>
-          <th>Thành tiền</th>
-        </tr>
-      </thead>
-      <tbody id="cart-items"></tbody>
-    </table>
+      <div class="cart-head-row">
+        <div>Sản phẩm</div>
+        <div>Giá</div>
+        <div>SL</div>
+        <div>Tổng</div>
+        <div>Thao tác</div>
+      </div>
 
-    <div class="cart-total">
-      Tổng tiền: <span id="cart-total">0đ</span>
-    </div>
-    <div class="cart-actions">
-      <a href="../thanhtoan/thanhtoan.php">
-        <button class="checkout-btn">Thanh toán</button>
-      </a>
+      <div class="cart-items" id="items"></div>
+    </section>
+  </main>
+
+  <div class="cart-bottom-anchor" id="cart-bottom-anchor"></div>
+
+  <div class="cart-bottom-wrap">
+    <div class="cart-bottom-bar">
+      <label class="select-all">
+        <input type="checkbox" id="all">
+        <span>Chọn tất cả</span>
+      </label>
+
+      <div class="total-price">
+        Tổng: <span id="total">0đ</span>
+      </div>
+
+      <button class="checkout" id="checkout-page-btn" type="button">Thanh toán</button>
     </div>
   </div>
 
-  <script defer src="giohang.js?v=20260318-2"></script>
+  <script defer src="giohang.js?v=20260322-6"></script>
 
   <footer class="site-footer" id="site-footer"></footer>
 </body>
