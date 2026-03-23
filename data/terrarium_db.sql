@@ -95,6 +95,28 @@ CREATE TABLE IF NOT EXISTS `order_items` (
   FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ------------------------------------------------------------
+-- 6. BẢNG GIỎ HÀNG (carts)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `carts` (
+  `id`       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id`  INT UNSIGNED NOT NULL UNIQUE,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- 7. BẢNG CHI TIẾT GIỎ HÀNG (cart_items)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cart_items` (
+  `id`         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `cart_id`    INT UNSIGNED NOT NULL,
+  `product_id` INT UNSIGNED NOT NULL,
+  `so_luong`   INT UNSIGNED DEFAULT 1,
+  FOREIGN KEY (`cart_id`) REFERENCES `carts`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE,
+  UNIQUE(`cart_id`, `product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ============================================================
 --  DỮ LIỆU MẪU
 -- ============================================================
@@ -103,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `order_items` (
 -- Tài khoản quản trị mặc định
 -- (Mật khẩu gốc: Admin@123  –  đã hash bằng PASSWORD_BCRYPT)
 -- ------------------------------------------------------------
-INSERT INTO `users` (`ho_ten`, `email`, `mat_khau`, `vai_tro`) VALUES
+INSERT IGNORE INTO `users` (`ho_ten`, `email`, `mat_khau`, `vai_tro`) VALUES
 ('Quản Trị Viên', 'admin@thuanphatgarden.vn',
  '$2y$12$z7G5vXkH5oNp1nVSa5gFbu3jOaJuqoHcl3ZbWepUJkNkd8hDclnAq',
  'quan_tri');
@@ -111,7 +133,7 @@ INSERT INTO `users` (`ho_ten`, `email`, `mat_khau`, `vai_tro`) VALUES
 -- ------------------------------------------------------------
 -- Sản phẩm (8 sản phẩm theo code JS)
 -- ------------------------------------------------------------
-INSERT INTO `products` (`id`, `ten_sp`, `gia`, `gia_goc`, `hinh_chinh`, `mo_ta`, `tinh_trang`) VALUES
+INSERT IGNORE INTO `products` (`id`, `ten_sp`, `gia`, `gia_goc`, `hinh_chinh`, `mo_ta`, `tinh_trang`) VALUES
 
 (1,
  'Terrarium Bình Trứng Mini',

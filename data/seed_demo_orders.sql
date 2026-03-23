@@ -7,28 +7,22 @@ SET @demo_address := '131 Ly Tu Trong, Ninh Kieu, Can Tho';
 SET @demo_password_hash := '$2y$10$hEh3VhivtOgMICnniZxkK.yCDcj5UZ1NcY7pmb80qmBOisshrEvmS';
 
 INSERT INTO `users` (
-  `name`,
   `ho_ten`,
   `email`,
-  `password`,
   `mat_khau`,
   `so_dien_thoai`,
   `dia_chi`,
   `vai_tro`
 ) VALUES (
   @demo_name,
-  @demo_name,
   @demo_email,
-  @demo_password_hash,
   @demo_password_hash,
   @demo_phone,
   @demo_address,
   'khach'
 )
 ON DUPLICATE KEY UPDATE
-  `name` = VALUES(`name`),
   `ho_ten` = VALUES(`ho_ten`),
-  `password` = VALUES(`password`),
   `mat_khau` = VALUES(`mat_khau`),
   `so_dien_thoai` = VALUES(`so_dien_thoai`),
   `dia_chi` = VALUES(`dia_chi`),
