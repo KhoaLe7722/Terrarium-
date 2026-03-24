@@ -28,9 +28,11 @@ $email = trim($data['email_kh'] ?? ($_SESSION['user_email'] ?? ''));
 $sdt = trim($data['sdt_kh'] ?? '');
 $diaChi = trim($data['dia_chi_giao'] ?? '');
 $ghiChu = trim($data['ghi_chu'] ?? '');
+$phuongThucTT = trim($data['phuong_thuc_tt'] ?? 'cod');
 
-if ($hoTen === '' || $diaChi === '') {
-    echo json_encode(['success' => false, 'message' => 'Vui lòng nhập đầy đủ họ tên và địa chỉ giao hàng.']);
+// ĐÃ SỬA: Yêu cầu bắt buộc phải có số điện thoại
+if ($hoTen === '' || $diaChi === '' || $sdt === '') {
+    echo json_encode(['success' => false, 'message' => 'Vui lòng nhập đầy đủ họ tên, số điện thoại và địa chỉ giao hàng.']);
     exit;
 }
 
@@ -79,11 +81,13 @@ try {
         ];
     }
 
+
     $orderStmt = $conn->prepare("
-        INSERT INTO orders (user_id, ho_ten_kh, email_kh, sdt_kh, dia_chi_giao, ghi_chu, tong_tien, trang_thai)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'cho_xac_nhan')
+        INSERT INTO orders (user_id, ho_ten_kh, email_kh, sdt_kh, dia_chi_giao, ghi_chu, tong_tien, phuong_thuc_tt, trang_thai)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'cho_xac_nhan')
     ");
-    $orderStmt->execute([$userId, $hoTen, $email, $sdt, $diaChi, $ghiChu, $tongTien]);
+    $orderStmt->execute([$userId, $hoTen, $email, $sdt, $diaChi, $ghiChu, $tongTien, $phuongThucTT]);
+
     $orderId = (int) $conn->lastInsertId();
 
     $itemStmt = $conn->prepare("
@@ -128,3 +132,4 @@ try {
         'message' => $e->getMessage(),
     ]);
 }
+?>

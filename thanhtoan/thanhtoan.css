@@ -1,56 +1,353 @@
+/* --- CÀI ĐẶT CƠ BẢN --- */
 body {
-  font-family: 'Dosis', sans-serif;
-  background-color: #f4f8f4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  margin: 0;
+    font-family: 'Dosis', sans-serif;
+    background-color: #f4f8f4;
+    margin: 0;
+    padding: 0;
 }
 
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: calc(100vh - 200px); 
+    padding-bottom: 50px;
+}
+
+/* --- FORM THANH TOÁN --- */
+.checkout-form {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 120px; 
+    padding: 30px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+    color: #54794a;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.section-subtitle {
+    color: #54794a;
+    font-size: 20px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+}
+
+.form-group input,
+.form-group textarea {
+    resize: none;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #54794a;
+    outline: none;
+}
+
+
+/* --- PHƯƠNG THỨC THANH TOÁN (NÂNG CẤP) --- */
+.payment-method-section {
+    margin-bottom: 30px;
+}
+
+/* Khung card cho mỗi phương thức */
+.payment-card {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* --- Cập nhật lại cấu trúc thẻ card --- */
+.payment-card {
+    display: flex;
+    flex-direction: column; /* Đổi thành xếp dọc để chứa phần chi tiết ở dưới */
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden; /* Giữ phần chi tiết gọn gàng */
+}
+
+.payment-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Các CSS icon, text cũ vẫn giữ nguyên... */
+.payment-info ion-icon {
+    font-size: 32px;
+    color: #54794a;
+    margin-right: 15px;
+}
+
+.payment-info input[type="radio"] {
+    margin-right: 15px;
+    transform: scale(1.3);
+    accent-color: #54794a;
+    cursor: pointer;
+}
+
+/* ✨ CSS CHO PHẦN CHI TIẾT (QR CODE) ✨ */
+.payment-details {
+    display: none; /* Ẩn đi mặc định */
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #ccc;
+    animation: fadeInDown 0.3s ease forwards;
+}
+
+/* Chỉ hiển thị hộp chi tiết khi radio tương ứng được tick */
+.payment-card:has(input[type="radio"]:checked) .payment-details {
+    display: block;
+}
+
+.payment-card:has(input[type="radio"]:checked) {
+    border: 2px solid #54794a;
+    background-color: #f9fbf9;
+}
+
+/* Bố cục bên trong hộp chi tiết (Hình ảnh bên trái, Text bên phải) */
+.qr-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.qr-container img {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    padding: 5px;
+    background: #fff;
+}
+
+.bank-info p {
+    margin: 5px 0;
+    font-size: 15px;
+    color: #444;
+}
+
+/* Hiệu ứng trượt xuống mượt mà */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive cho điện thoại */
+@media (max-width: 500px) {
+    .qr-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Hiệu ứng khi lướt chuột qua */
+.payment-card:hover {
+    border-color: #54794a;
+    box-shadow: 0 4px 10px rgba(84, 121, 74, 0.08);
+}
+
+/* Tăng kích thước nút radio */
+.payment-card input[type="radio"] {
+    margin-right: 15px;
+    transform: scale(1.3);
+    accent-color: #54794a;
+    cursor: pointer;
+}
+
+/* Bố cục icon và chữ */
+.payment-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.payment-info ion-icon {
+    font-size: 32px;
+    color: #54794a;
+}
+
+.payment-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-text strong {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.payment-text small {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.4;
+}
+
+/* ✨ HIỆU ỨNG ĐẶC BIỆT KHI ĐƯỢC CHỌN ✨ */
+/* Khi radio bên trong được check, khung viền sẽ đổi màu xanh và nền xanh nhạt */
+.payment-card:has(input[type="radio"]:checked) {
+    border: 2px solid #54794a;
+    background-color: #f4f8f4;
+}
+
+/* --- TỔNG QUAN ĐƠN HÀNG --- */
+.order-summary {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border: 1px solid #eee;
+}
+
+#order-items-container {
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.cart-item-preview {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: #555;
+}
+
+.order-total {
+    font-size: 22px;
+    font-weight: 700;
+    color: #54794a;
+    text-align: right;
+}
+
+.btn-order {
+    width: 100%;
+    padding: 15px;
+    background: #54794a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-family: 'Dosis', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-order:hover {
+    background: #43a047;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(84, 121, 74, 0.3);
+}
+
+/* --- THÔNG BÁO THÀNH CÔNG --- */
 .success-box {
-  background-color: #ffffff;
-  padding: 50px 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 400px;
-  margin-top: 120px;
+    display: none; 
+    background-color: #ffffff;
+    padding: 50px 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    margin-top: 120px;
 }
 
-.success-icon {
-  font-size: 50px;
-  color: #4caf50;
+.success-icon ion-icon {
+    font-size: 80px; 
+    color: #4caf50;
 }
 
 .success-message {
-  font-size: 28px;
-  font-weight: bold;
-  color: #4caf50;
-  margin-top: 10px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #4caf50;
+    margin-top: 15px;
 }
 
-.total-amount {
-  font-size: 22px;
-  margin-top: 15px;
-  color: #333;
+.success-box p {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
 }
 
 .home-link {
-  margin-top: 25px;
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 16px;
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #4caf50;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    transition: background 0.3s;
 }
 
 .home-link:hover {
-  background-color: #43a047;
+    background-color: #43a047;
 }
-.site-footer{
+
+.site-footer {
     width: 100%;
+    margin-top: 50px;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr; 
+    }
+    
+    .checkout-form, .success-box {
+        margin: 100px 15px 30px;
+        padding: 20px;
+    }
 }
