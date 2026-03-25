@@ -1,15 +1,44 @@
+function getLayoutScript() {
+  return document.currentScript || document.querySelector('script[src*="mainfont/layout.js"]');
+}
+
+function getAppRootUrl() {
+  var script = getLayoutScript();
+
+  if (script && script.src) {
+    return new URL('../', script.src);
+  }
+
+  return new URL('../', window.location.href);
+}
+
+var APP_ROOT_URL = getAppRootUrl();
+
+function buildAppHref(path) {
+  return new URL(path, APP_ROOT_URL).pathname;
+}
+
+function buildAppUrl(path) {
+  return new URL(path, APP_ROOT_URL).href;
+}
+
 var STORE_PATHS = {
-  home: "../trangchu/index.php",
-  products: "../sanpham/sanpham.php",
-  about: "../gioithieu/gioithieu.html",
-  news: "../tintuc/tintuc.html",
-  guide: "../huongdan/huongdan.html",
-  cart: "../giohang/giohang.html",
-  login: "../dangky_dangnhap/dangnhap.php",
-  register: "../dangky_dangnhap/dangky.php",
-  profile: "../dangky_dangnhap/ho_so.php",
-  logout: "../dangky_dangnhap/logout.php",
-  admin: "../admin/dashboard.php"
+  home: buildAppHref('trangchu/index.php'),
+  products: buildAppHref('sanpham/sanpham.php'),
+  about: buildAppHref('gioithieu/gioithieu.php'),
+  news: buildAppHref('tintuc/tintuc.php'),
+  guide: buildAppHref('huongdan/huongdan.php'),
+  cart: buildAppHref('giohang/giohang.php'),
+  login: buildAppHref('dangky_dangnhap/dangnhap.php'),
+  register: buildAppHref('dangky_dangnhap/dangky.php'),
+  profile: buildAppHref('dangky_dangnhap/ho_so.php'),
+  logout: buildAppHref('dangky_dangnhap/logout.php'),
+  admin: buildAppHref('admin/dashboard.php'),
+  session: buildAppUrl('dangky_dangnhap/check_session.php')
+};
+
+var ASSET_PATHS = {
+  logo: buildAppHref('images/Head.jpg')
 };
 
 var NAV_ITEMS = [
@@ -23,9 +52,68 @@ var NAV_ITEMS = [
 var sessionState = {
   loggedIn: false,
   userName: "",
+  userAvatar: "",
   userRole: "khach",
   adminUrl: null
 };
+
+function escapeHtml(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function clearStoredCart() {
+  try {
+    localStorage.removeItem("cart");
+  } catch (error) { }
+
+  if (typeof window.refreshCartBadge === "function") {
+    window.refreshCartBadge([]);
+  }
+
+  try {
+    window.dispatchEvent(new CustomEvent("store:cart-updated", {
+      detail: { cart: [] }
+    }));
+  } catch (error) { }
+}
+
+function getStoredCartCount() {
+  try {
+    var cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (!Array.isArray(cart)) {
+      return 0;
+    }
+
+    var total = 0;
+    for (var i = 0; i < cart.length; i++) {
+      var quantity = Number(cart[i] && cart[i].quantity) || 0;
+      if (quantity > 0) {
+        total += quantity;
+      }
+    }
+
+    return total;
+  } catch (error) {
+    return 0;
+  }
+}
+
+function buildCartBadgeMarkup() {
+  var totalCount = getStoredCartCount();
+  var badgeText = totalCount > 99 ? '99+' : String(totalCount);
+  var hiddenAttr = totalCount > 0 ? '' : ' hidden';
+  var visibleClass = totalCount > 0 ? ' is-visible' : '';
+  var label = totalCount > 0
+    ? 'Giỏ hàng có ' + totalCount + ' sản phẩm'
+    : 'Giỏ hàng đang trống';
+
+  return '<span class="cart-count-badge' + visibleClass + '" id="cart-count-badge" aria-live="polite" aria-atomic="true" aria-label="' + label + '"' + hiddenAttr + '>' + badgeText + '</span>';
+}
 
 var FOOTER_HTML = '' +
   '<div class="footer-container">' +
@@ -87,7 +175,7 @@ function buildAccountDropdown() {
     '<div class="login-container">' +
     '<div class="login-trigger" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">' +
     '<span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>' +
-    '<span class="text">' + userLabel + '</span>' +
+    '<span class="text">' + escapeHtml(userLabel) + '</span>' +
     '</div>' +
     '<div class="login-dropdown">' +
     '<a href="' + STORE_PATHS.profile + '">Hồ sơ</a>' +
@@ -121,17 +209,20 @@ function buildNav(activeKey) {
     '</ul>' +
     '<div class="nav-logo">' +
     '<a href="' + STORE_PATHS.home + '">' +
-    '<img src="../images/Head.jpg" alt="Logo Thuận Phát Garden" />' +
+    '<img src="' + ASSET_PATHS.logo + '" alt="Logo Thuận Phát Garden" />' +
     '</a>' +
     '</div>' +
     '<ul class="nav-right">' +
-    '<li class="list right-action">' +
+    '<li class="list right-action" data-page="cart">' +
     '<a href="' + STORE_PATHS.cart + '" id="cart-toggle">' +
-    '<span class="icon"><ion-icon name="cart-outline"></ion-icon></span>' +
+    '<span class="icon cart-icon-wrap">' +
+    '<ion-icon name="cart-outline"></ion-icon>' +
+    buildCartBadgeMarkup() +
+    '</span>' +
     '<span class="text">Giỏ hàng</span>' +
     '</a>' +
     '</li>' +
-    '<li class="list right-action">' +
+    '<li class="list right-action" data-page="profile">' +
     buildAccountDropdown() +
     '</li>' +
     '</ul>' +
@@ -147,6 +238,10 @@ function renderNav() {
   var activeKey = document.body.getAttribute("data-page") || "";
   nav.innerHTML = buildNav(activeKey);
   document.dispatchEvent(new CustomEvent("layout:updated"));
+
+  if (typeof window.refreshCartBadge === "function") {
+    window.refreshCartBadge();
+  }
 }
 
 function renderFooter() {
@@ -156,19 +251,26 @@ function renderFooter() {
 }
 
 function loadSession() {
-  return fetch("../dangky_dangnhap/check_session.php", { credentials: "same-origin" })
+  return fetch(STORE_PATHS.session, { credentials: "same-origin" })
     .then(function (response) { return response.json(); })
     .then(function (data) {
       sessionState.loggedIn = !!data.loggedIn;
       sessionState.userName = data.userName || "";
+      sessionState.userAvatar = data.userAvatar || "";
       sessionState.userRole = data.userRole || "khach";
       sessionState.adminUrl = data.adminUrl || null;
+
+      if (!sessionState.loggedIn) {
+        clearStoredCart();
+      }
     })
     .catch(function () {
       sessionState.loggedIn = false;
       sessionState.userName = "";
+      sessionState.userAvatar = "";
       sessionState.userRole = "khach";
       sessionState.adminUrl = null;
+      clearStoredCart();
     });
 }
 
@@ -180,3 +282,4 @@ document.addEventListener("DOMContentLoaded", function () {
     renderNav();
   });
 });
+

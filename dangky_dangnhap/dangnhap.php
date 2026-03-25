@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = 'Vui lòng nhập đầy đủ email và mật khẩu.';
     } else {
         $stmt = $conn->prepare("
-            SELECT id, ho_ten, email, mat_khau, vai_tro
+            SELECT id, ho_ten, email, mat_khau, anh_dai_dien, vai_tro
             FROM users
             WHERE email = ?
             LIMIT 1
@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = (int) $user['id'];
             $_SESSION['user_name'] = $user['ho_ten'];
             $_SESSION['user_email'] = $user['email'];
+            $_SESSION['user_avatar'] = $user['anh_dai_dien'] ?? null;
             $_SESSION['user_role'] = $user['vai_tro'];
 
             header('Location: ' . $redirectTarget);
@@ -63,14 +64,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
-    <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
-    <link rel="stylesheet" href="dangky_dangnhap.css" />
+    <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
+    <link rel="stylesheet" href="dangky_dangnhap.css?v=20260324-1" />
 </head>
 
 <body data-page="login">
     <nav class="navigation" id="main-nav"></nav>
-    <script defer src="../mainfont/layout.js?v=20260318-2"></script>
-    <script defer src="../mainfont/main.js?v=20260318-2"></script>
+    <script defer src="../mainfont/layout.js?v=20260324-9"></script>
+    <script defer src="../mainfont/main.js?v=20260324-6"></script>
 
     <main class="body__main body__main__login">
         <div class="auth-form">
@@ -100,8 +101,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="auth-form__group">
                             <label for="password" class="form-label">Mật khẩu</label>
-                            <input id="password" name="password" type="password" class="auth-form__input"
-                                placeholder="Nhập mật khẩu" required />
+                            <div class="auth-form__password-wrap">
+                                <input id="password" name="password" type="password" class="auth-form__input auth-form__input--password"
+                                    placeholder="Nhập mật khẩu" required />
+                                <button
+                                    type="button"
+                                    class="auth-form__toggle-password"
+                                    data-toggle-password
+                                    data-target="password"
+                                    aria-label="Hiện mật khẩu"
+                                    aria-pressed="false">
+                                    <i class="far fa-eye-slash" aria-hidden="true"></i>
+                                </button>
+                            </div>
                             <small id="feedback-password" class="form-message"></small>
                         </div>
                     </div>
@@ -116,7 +128,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
 
     <footer class="site-footer" id="site-footer"></footer>
-    <script src="dangnhap.js"></script>
+    <script src="dangnhap.js?v=20260324-2"></script>
 </body>
 
 </html>
+
+
+
+
+
+
+
+

@@ -3,6 +3,32 @@ window.onload = function () {
     const password = document.getElementById("password");
     const confirmPassword = document.getElementById("confirm_password");
     const name = document.getElementById("name");
+    const toggleButtons = document.querySelectorAll("[data-toggle-password]");
+
+    toggleButtons.forEach((button) => {
+        const targetId = button.dataset.target;
+        const input = document.getElementById(targetId);
+        const icon = button.querySelector("i");
+
+        if (!input || !icon) {
+            return;
+        }
+
+        function syncPasswordToggle() {
+            const isVisible = input.type === "text";
+            button.setAttribute("aria-pressed", String(isVisible));
+            button.setAttribute("aria-label", isVisible ? "Ẩn mật khẩu" : "Hiện mật khẩu");
+            icon.classList.toggle("fa-eye", isVisible);
+            icon.classList.toggle("fa-eye-slash", !isVisible);
+        }
+
+        syncPasswordToggle();
+
+        button.addEventListener("click", function () {
+            input.type = input.type === "password" ? "text" : "password";
+            syncPasswordToggle();
+        });
+    });
 
     function checkEmail() {
         const elMsg = document.getElementById("feedback-email");

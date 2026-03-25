@@ -230,6 +230,7 @@ if (!function_exists('ensure_store_schema')) {
                 ho_ten VARCHAR(100) NOT NULL,
                 email VARCHAR(150) NOT NULL UNIQUE,
                 mat_khau VARCHAR(255) NOT NULL,
+                anh_dai_dien VARCHAR(300) DEFAULT NULL,
                 so_dien_thoai VARCHAR(20) DEFAULT NULL,
                 dia_chi TEXT DEFAULT NULL,
                 vai_tro ENUM('khach', 'quan_tri') NOT NULL DEFAULT 'khach',
@@ -241,6 +242,7 @@ if (!function_exists('ensure_store_schema')) {
         $userColumns = [
             'ho_ten' => "ALTER TABLE users ADD COLUMN ho_ten VARCHAR(100) NOT NULL DEFAULT ''",
             'mat_khau' => "ALTER TABLE users ADD COLUMN mat_khau VARCHAR(255) NOT NULL DEFAULT ''",
+            'anh_dai_dien' => "ALTER TABLE users ADD COLUMN anh_dai_dien VARCHAR(300) DEFAULT NULL",
             'so_dien_thoai' => "ALTER TABLE users ADD COLUMN so_dien_thoai VARCHAR(20) DEFAULT NULL",
             'dia_chi' => "ALTER TABLE users ADD COLUMN dia_chi TEXT DEFAULT NULL",
             'vai_tro' => "ALTER TABLE users ADD COLUMN vai_tro ENUM('khach', 'quan_tri') NOT NULL DEFAULT 'khach'",
@@ -289,12 +291,15 @@ if (!function_exists('ensure_store_schema')) {
                 giam_gia_ket_thuc DATETIME DEFAULT NULL,
                 hinh_chinh VARCHAR(300) DEFAULT NULL,
                 mo_ta LONGTEXT DEFAULT NULL,
+                so_luong_ton INT UNSIGNED NOT NULL DEFAULT 0,
+                ngay_bao_tri_gan_nhat DATE DEFAULT NULL,
                 tinh_trang ENUM('con_hang', 'het_hang') NOT NULL DEFAULT 'con_hang',
                 ngay_tao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 ngay_capnhat DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         ");
 
+        $stockColumnAdded = false;
         $productColumns = [
             'gia_goc' => "ALTER TABLE products ADD COLUMN gia_goc DECIMAL(12,0) DEFAULT NULL",
             'giam_gia_phan_tram' => "ALTER TABLE products ADD COLUMN giam_gia_phan_tram TINYINT UNSIGNED DEFAULT 0",
@@ -302,6 +307,8 @@ if (!function_exists('ensure_store_schema')) {
             'giam_gia_ket_thuc' => "ALTER TABLE products ADD COLUMN giam_gia_ket_thuc DATETIME DEFAULT NULL",
             'hinh_chinh' => "ALTER TABLE products ADD COLUMN hinh_chinh VARCHAR(300) DEFAULT NULL",
             'mo_ta' => "ALTER TABLE products ADD COLUMN mo_ta LONGTEXT DEFAULT NULL",
+            'so_luong_ton' => "ALTER TABLE products ADD COLUMN so_luong_ton INT UNSIGNED NOT NULL DEFAULT 0",
+            'ngay_bao_tri_gan_nhat' => "ALTER TABLE products ADD COLUMN ngay_bao_tri_gan_nhat DATE DEFAULT NULL",
             'tinh_trang' => "ALTER TABLE products ADD COLUMN tinh_trang ENUM('con_hang', 'het_hang') NOT NULL DEFAULT 'con_hang'",
             'ngay_tao' => "ALTER TABLE products ADD COLUMN ngay_tao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP",
             'ngay_capnhat' => "ALTER TABLE products ADD COLUMN ngay_capnhat DATETIME DEFAULT NULL"
@@ -310,8 +317,32 @@ if (!function_exists('ensure_store_schema')) {
         foreach ($productColumns as $column => $sql) {
             if (!db_column_exists($conn, 'products', $column)) {
                 safe_exec($conn, $sql);
+                if ($column === 'so_luong_ton') {
+                    $stockColumnAdded = true;
+                }
             }
         }
+
+        if ($stockColumnAdded) {
+            safe_exec($conn, "
+                UPDATE products
+                SET so_luong_ton = CASE
+                    WHEN tinh_trang = 'con_hang' THEN 1
+                    ELSE 0
+                END
+                WHERE so_luong_ton = 0
+            ");
+        }
+
+        safe_exec($conn, "
+            UPDATE products
+            SET tinh_trang = CASE
+                WHEN COALESCE(so_luong_ton, 0) > 0 THEN 'con_hang'
+                ELSE 'het_hang'
+            END
+            WHERE (COALESCE(so_luong_ton, 0) > 0 AND tinh_trang <> 'con_hang')
+               OR (COALESCE(so_luong_ton, 0) = 0 AND tinh_trang <> 'het_hang')
+        ");
 
         safe_exec($conn, "
             CREATE TABLE IF NOT EXISTS product_images (
@@ -339,6 +370,7 @@ if (!function_exists('ensure_store_schema')) {
                 dia_chi_giao TEXT NOT NULL,
                 ghi_chu TEXT DEFAULT NULL,
                 tong_tien DECIMAL(14,0) NOT NULL DEFAULT 0,
+                phuong_thuc_tt VARCHAR(20) NOT NULL DEFAULT 'cod',
                 trang_thai ENUM('cho_xac_nhan', 'dang_xu_ly', 'dang_giao', 'da_giao', 'da_huy')
                     NOT NULL DEFAULT 'cho_xac_nhan',
                 ngay_dat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -348,6 +380,10 @@ if (!function_exists('ensure_store_schema')) {
                     ON DELETE SET NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         ");
+
+        if (!db_column_exists($conn, 'orders', 'phuong_thuc_tt')) {
+            safe_exec($conn, "ALTER TABLE orders ADD COLUMN phuong_thuc_tt VARCHAR(20) NOT NULL DEFAULT 'cod' AFTER tong_tien");
+        }
 
         safe_exec($conn, "
             CREATE TABLE IF NOT EXISTS order_items (

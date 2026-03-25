@@ -1,12 +1,11 @@
-<?php
+﻿<?php
 require_once '../dangky_dangnhap/config.php';
 require_once '../includes/store_helpers.php';
 
 $stmt = $conn->query("
-    SELECT id, ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh
+    SELECT id, ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh, so_luong_ton
     FROM products
-    WHERE tinh_trang = 'con_hang'
-    ORDER BY id ASC
+    ORDER BY (so_luong_ton > 0) DESC, id ASC
 ");
 $products = $stmt->fetchAll();
 ?>
@@ -16,24 +15,24 @@ $products = $stmt->fetchAll();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tất cả sản phẩm | Thuận Phát G Garden</title>
+  <title>Tất cả sản phẩm | Thuận Phát Garden</title>
   <link rel="icon" href="../images/avatar.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="sanpham.css" />
-    <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
+  <link rel="stylesheet" href="sanpham.css?v=20260324-1" />
+  <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
 
 <body data-page="products">
   <nav class="navigation" id="main-nav"></nav>
-    <script defer src="../mainfont/layout.js?v=20260318-2"></script>
-    <script defer src="../mainfont/main.js?v=20260318-2"></script>
+  <script defer src="../mainfont/layout.js?v=20260324-9"></script>
+  <script defer src="../mainfont/main.js?v=20260324-6"></script>
 
   <div class="page-header">
     <h1>Tất cả sản phẩm</h1>
     <div class="breadcrumb">
-      <a href="../trangchu/index.html">Trang chủ</a> &gt;
+      <a href="../trangchu/index.php">Trang chủ</a> &gt;
       <span>Tất cả sản phẩm</span>
     </div>
   </div>
@@ -62,12 +61,19 @@ $products = $stmt->fetchAll();
             </div>
           <?php else: ?>
             <?php foreach ($products as $product): ?>
-              <?php $pricing = get_product_pricing($product); ?>
-              <div class="product-card" data-price="<?= htmlspecialchars((string) $pricing['price']) ?>">
-                <a href="spchitiet.html?id=<?= (int) $product['id'] ?>" class="product-link">
+              <?php
+              $pricing = get_product_pricing($product);
+              $stock = inventory_quantity($product);
+              $isInStock = $stock > 0;
+              ?>
+              <div class="product-card <?= $isInStock ? '' : 'is-sold-out' ?>" data-price="<?= htmlspecialchars((string) $pricing['price']) ?>">
+                <a href="spchitiet.php?id=<?= (int) $product['id'] ?>" class="product-link">
                   <div class="product-image-container">
                     <?php if ($pricing['is_sale']): ?>
                       <span class="sale-badge">-<?= (int) $pricing['discount_percent'] ?>%</span>
+                    <?php endif; ?>
+                    <?php if (!$isInStock): ?>
+                      <span class="stock-badge stock-badge-out">Hết hàng</span>
                     <?php endif; ?>
                     <img
                       class="product-image"
@@ -83,6 +89,9 @@ $products = $stmt->fetchAll();
                     <?php if ($pricing['is_sale']): ?>
                       <span class="old-price"><?= htmlspecialchars(format_currency_vnd($pricing['original_price'])) ?></span>
                     <?php endif; ?>
+                  </div>
+                  <div class="product-stock-note <?= $isInStock ? '' : 'is-out' ?>">
+                    <?= $isInStock ? 'Còn ' . $stock . ' sản phẩm' : 'Sản phẩm đang tạm hết hàng' ?>
                   </div>
                 </div>
               </div>
@@ -122,5 +131,11 @@ $products = $stmt->fetchAll();
 </body>
 
 </html>
+
+
+
+
+
+
 
 

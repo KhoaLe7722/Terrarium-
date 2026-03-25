@@ -41,6 +41,10 @@
   flex-direction: column;
 }
 
+.product-card.is-sold-out {
+  opacity: 0.82;
+}
+
 .product-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
@@ -133,6 +137,39 @@
   z-index: 10;
   box-shadow: 0 12px 22px rgba(200, 30, 30, 0.26);
   font-family: 'Dosis', sans-serif;
+}
+
+.stock-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  z-index: 10;
+  box-shadow: 0 12px 22px rgba(20, 27, 18, 0.16);
+}
+
+.stock-badge-out {
+  background: rgba(55, 65, 81, 0.92);
+  color: #fff;
+}
+
+.product-stock-note {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c6d31;
+}
+
+.product-stock-note.is-out {
+  color: #b42318;
 }
 
 /* ==== Bá»˜ Lá»ŒC Sáº¢N PHáº¨M ==== */

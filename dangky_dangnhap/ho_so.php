@@ -8,10 +8,165 @@ if (empty($_SESSION['user_id'])) {
     exit;
 }
 
+function delete_profile_avatar_file(?string $relativePath): void
+{
+    $normalizedPath = ltrim(str_replace('\\', '/', trim((string) $relativePath)), './');
+    if ($normalizedPath === '' || strpos($normalizedPath, 'uploads/avatars/') !== 0) {
+        return;
+    }
+
+    $absolutePath = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $normalizedPath);
+    if (is_file($absolutePath)) {
+        @unlink($absolutePath);
+    }
+}
+
+function upload_profile_avatar_file(array $file): array
+{
+    $errorCode = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($errorCode !== UPLOAD_ERR_OK) {
+        return [
+            'ok' => false,
+            'message' => 'Tải ảnh đại diện thất bại. Vui lòng thử lại.',
+        ];
+    }
+
+    $tmpName = (string) ($file['tmp_name'] ?? '');
+    if ($tmpName === '' || !is_uploaded_file($tmpName)) {
+        return [
+            'ok' => false,
+            'message' => 'Không thể đọc tệp ảnh đại diện đã chọn.',
+        ];
+    }
+
+    $extension = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!in_array($extension, $allowedExtensions, true) || @getimagesize($tmpName) === false) {
+        return [
+            'ok' => false,
+            'message' => 'Ảnh đại diện phải là tệp JPG, PNG, GIF hoặc WEBP hợp lệ.',
+        ];
+    }
+
+    if ((int) ($file['size'] ?? 0) > 2 * 1024 * 1024) {
+        return [
+            'ok' => false,
+            'message' => 'Ảnh đại diện chỉ được tối đa 2MB.',
+        ];
+    }
+
+    $uploadDirectory = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'avatars';
+    if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0777, true) && !is_dir($uploadDirectory)) {
+        return [
+            'ok' => false,
+            'message' => 'Không thể tạo thư mục lưu ảnh đại diện.',
+        ];
+    }
+
+    $fileName = uniqid('avatar_', true) . '.' . $extension;
+    $destination = $uploadDirectory . DIRECTORY_SEPARATOR . $fileName;
+    if (!move_uploaded_file($tmpName, $destination)) {
+        return [
+            'ok' => false,
+            'message' => 'Không thể lưu ảnh đại diện. Vui lòng thử lại.',
+        ];
+    }
+
+    return [
+        'ok' => true,
+        'path' => 'uploads/avatars/' . $fileName,
+    ];
+}
+
 $user = current_user($conn);
 if (!$user) {
     header('Location: logout.php');
     exit;
+}
+
+$profileMessage = '';
+$profileMessageType = '';
+
+if (isset($_GET['updated']) && $_GET['updated'] === '1') {
+    $profileMessage = 'Thông tin khách hàng đã được cập nhật.';
+    $profileMessageType = 'success';
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['profile_action'] ?? '') === 'update_profile') {
+    $fullName = trim((string) ($_POST['ho_ten'] ?? ''));
+    $phoneNumber = trim((string) ($_POST['so_dien_thoai'] ?? ''));
+    $address = trim((string) ($_POST['dia_chi'] ?? ''));
+    $currentAvatarPath = $user['anh_dai_dien'] ?? null;
+    $avatarPath = $currentAvatarPath;
+
+    if ($fullName === '') {
+        $profileMessage = 'Vui lòng nhập tên khách hàng.';
+        $profileMessageType = 'error';
+    } elseif (mb_strlen($fullName) > 100) {
+        $profileMessage = 'Tên khách hàng chỉ được tối đa 100 ký tự.';
+        $profileMessageType = 'error';
+    } elseif (strlen($phoneNumber) > 20) {
+        $profileMessage = 'Số điện thoại chỉ được tối đa 20 ký tự.';
+        $profileMessageType = 'error';
+    } elseif ($phoneNumber !== '' && !preg_match('/^[0-9+\-\s().]+$/', $phoneNumber)) {
+        $profileMessage = 'Số điện thoại chỉ được chứa số và các ký tự + - ( ) .';
+        $profileMessageType = 'error';
+    } else {
+        $hasNewAvatar = isset($_FILES['anh_dai_dien'])
+            && (int) ($_FILES['anh_dai_dien']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
+
+        if ($hasNewAvatar) {
+            $uploadResult = upload_profile_avatar_file($_FILES['anh_dai_dien']);
+            if (!($uploadResult['ok'] ?? false)) {
+                $profileMessage = (string) ($uploadResult['message'] ?? 'Cập nhật ảnh đại diện thất bại.');
+                $profileMessageType = 'error';
+            } else {
+                $avatarPath = $uploadResult['path'];
+            }
+        }
+
+        if ($profileMessage === '') {
+            try {
+                $updateStmt = $conn->prepare("
+                    UPDATE users
+                    SET ho_ten = ?, so_dien_thoai = ?, dia_chi = ?, anh_dai_dien = ?
+                    WHERE id = ?
+                ");
+                $updateStmt->execute([
+                    $fullName,
+                    $phoneNumber !== '' ? $phoneNumber : null,
+                    $address !== '' ? $address : null,
+                    $avatarPath,
+                    $user['id'],
+                ]);
+
+                if ($hasNewAvatar && $currentAvatarPath !== $avatarPath) {
+                    delete_profile_avatar_file($currentAvatarPath);
+                }
+
+                $_SESSION['user_name'] = $fullName;
+                $_SESSION['user_avatar'] = $avatarPath;
+
+                header('Location: ho_so.php?updated=1');
+                exit;
+            } catch (Throwable $e) {
+                if ($hasNewAvatar && $currentAvatarPath !== $avatarPath) {
+                    delete_profile_avatar_file($avatarPath);
+                    $avatarPath = $currentAvatarPath;
+                }
+
+                $profileMessage = 'Không thể cập nhật thông tin lúc này. Vui lòng thử lại.';
+                $profileMessageType = 'error';
+            }
+        }
+    }
+
+    if ($profileMessageType === 'error') {
+        $user['ho_ten'] = $fullName;
+        $user['so_dien_thoai'] = $phoneNumber;
+        $user['dia_chi'] = $address;
+        $user['anh_dai_dien'] = $avatarPath;
+    }
 }
 
 $statusClasses = [
@@ -23,7 +178,7 @@ $statusClasses = [
 ];
 
 $stmt = $conn->prepare("
-    SELECT id, ho_ten_kh, tong_tien, trang_thai, ngay_dat, ghi_chu
+    SELECT id, ho_ten_kh, email_kh, sdt_kh, dia_chi_giao, tong_tien, trang_thai, ngay_dat, ghi_chu, phuong_thuc_tt
     FROM orders
     WHERE user_id = ?
     ORDER BY ngay_dat DESC
@@ -46,8 +201,8 @@ $orders = $stmt->fetchAll();
     <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
-    <link rel="stylesheet" href="ho_so.css" />
+    <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
+    <link rel="stylesheet" href="ho_so.css?v=20260324-3" />
     <style>
         .profile-info {
             width: 100%;
@@ -130,39 +285,88 @@ $orders = $stmt->fetchAll();
 
 <body data-page="profile">
     <nav class="navigation" id="main-nav"></nav>
-    <script defer src="../mainfont/layout.js?v=20260318-2"></script>
-    <script defer src="../mainfont/main.js?v=20260318-2"></script>
+    <script defer src="../mainfont/layout.js?v=20260324-9"></script>
+    <script defer src="../mainfont/main.js?v=20260324-6"></script>
 
     <main class="body__main" style="margin-top: 30px; min-height: 60vh;">
         <div class="profile-container">
             <aside class="profile-sidebar">
                 <div class="profile-avatar-section">
-                    <div class="profile-avatar-placeholder">
-                        <ion-icon name="person-outline"></ion-icon>
-                    </div>
+                    <form class="profile-edit-form" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="profile_action" value="update_profile">
 
-                    <h3 class="profile-name"><?= htmlspecialchars($user['ho_ten']) ?></h3>
-                    <p class="profile-email"><?= htmlspecialchars($user['email']) ?></p>
+                        <img
+                            id="profile-avatar-preview"
+                            class="profile-avatar"
+                            src="<?= htmlspecialchars(normalize_public_path($user['anh_dai_dien'] ?? null)) ?>"
+                            alt="<?= htmlspecialchars($user['ho_ten']) ?>"
+                            onerror="this.onerror=null;this.src='../images/avatar.png';">
 
-                    <div class="profile-info">
-                        <div class="profile-info__item">
-                            <span class="profile-info__label">Số điện thoại</span>
-                            <?= htmlspecialchars($user['so_dien_thoai'] ?: 'Chưa cập nhật') ?>
-                        </div>
-                        <div class="profile-info__item">
-                            <span class="profile-info__label">Địa chỉ</span>
-                            <?= nl2br(htmlspecialchars($user['dia_chi'] ?: 'Chưa cập nhật')) ?>
-                        </div>
-                        <div class="profile-info__item">
-                            <span class="profile-info__label">Loại tài khoản</span>
-                            <?= htmlspecialchars($user['vai_tro'] === 'quan_tri' ? 'Quản trị' : 'Khách hàng') ?>
-                        </div>
-                    </div>
+                        <h3 class="profile-name"><?= htmlspecialchars($user['ho_ten']) ?></h3>
+                        <p class="profile-email"><?= htmlspecialchars($user['email']) ?></p>
 
-                    <div class="profile-actions">
-                        <a class="profile-action" href="../sanpham/sanpham.php">Mua tiếp</a>
-                        <a class="profile-action secondary" href="logout.php">Đăng xuất</a>
-                    </div>
+                        <?php if ($profileMessage !== ''): ?>
+                            <div class="profile-feedback <?= $profileMessageType === 'success' ? 'is-success' : 'is-error' ?>">
+                                <?= htmlspecialchars($profileMessage) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <label class="avatar-upload-form" for="anh_dai_dien">
+                            <span class="profile-action secondary btn-upload">Đổi ảnh đại diện</span>
+                            <input
+                                class="profile-avatar-input"
+                                type="file"
+                                id="anh_dai_dien"
+                                name="anh_dai_dien"
+                                accept="image/png,image/jpeg,image/webp,image/gif">
+                            <span class="profile-field-hint">PNG, JPG, GIF hoặc WEBP, tối đa 2MB.</span>
+                        </label>
+
+                        <div class="profile-info">
+                            <div class="profile-info__item">
+                                <span class="profile-info__label">Email đăng nhập</span>
+                                <?= htmlspecialchars($user['email']) ?>
+                            </div>
+                        </div>
+
+                        <div class="profile-form-group">
+                            <label class="profile-form-label" for="ho_ten">Tên khách hàng</label>
+                            <input
+                                class="profile-input"
+                                type="text"
+                                id="ho_ten"
+                                name="ho_ten"
+                                maxlength="100"
+                                required
+                                value="<?= htmlspecialchars($user['ho_ten']) ?>">
+                        </div>
+
+                        <div class="profile-form-group">
+                            <label class="profile-form-label" for="so_dien_thoai">Số điện thoại</label>
+                            <input
+                                class="profile-input"
+                                type="text"
+                                id="so_dien_thoai"
+                                name="so_dien_thoai"
+                                maxlength="20"
+                                value="<?= htmlspecialchars($user['so_dien_thoai'] ?? '') ?>">
+                        </div>
+
+                        <div class="profile-form-group">
+                            <label class="profile-form-label" for="dia_chi">Địa chỉ</label>
+                            <textarea
+                                class="profile-input profile-textarea"
+                                id="dia_chi"
+                                name="dia_chi"
+                                rows="4"><?= htmlspecialchars($user['dia_chi'] ?? '') ?></textarea>
+                        </div>
+
+                        <div class="profile-actions profile-actions--stack">
+                            <button type="submit" class="profile-action">Lưu thông tin</button>
+                            <a class="profile-action secondary" href="../sanpham/sanpham.php">Mua tiếp</a>
+                            <a class="profile-action secondary" href="logout.php">Đăng xuất</a>
+                        </div>
+                    </form>
                 </div>
             </aside>
 
@@ -185,6 +389,7 @@ $orders = $stmt->fetchAll();
                     <?php else: ?>
                         <?php foreach ($orders as $order): ?>
                             <?php
+                            $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
                             $itemStmt = $conn->prepare("
                                 SELECT oi.ten_sp, oi.gia, oi.so_luong, oi.thanh_tien, p.hinh_chinh
                                 FROM order_items oi
@@ -227,8 +432,27 @@ $orders = $stmt->fetchAll();
                                     </div>
                                 <?php endif; ?>
 
+                                <div class="order-inline-meta">
+                                    <span><strong>Thanh toán:</strong> <?= htmlspecialchars(payment_method_label($order['phuong_thuc_tt'] ?? '')) ?></span>
+                                    <span><strong>Sản phẩm:</strong> <?= count($items) ?></span>
+                                </div>
+
+                                <div class="order-actions">
+                                    <a class="profile-action is-small" href="order_detail.php?id=<?= (int) $order['id'] ?>">Xem hóa đơn</a>
+                                    <?php if ($canCancel): ?>
+                                        <button
+                                            type="button"
+                                            class="profile-action danger is-small js-open-cancel-order"
+                                            data-order-id="<?= (int) $order['id'] ?>"
+                                            data-order-label="#<?= (int) $order['id'] ?>">
+                                            Hủy đơn
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+
                                 <div class="order-footer">
-                                    Tổng thanh toán: <?= htmlspecialchars(format_currency_vnd($order['tong_tien'])) ?>
+                                    <span>Tổng thanh toán</span>
+                                    <span><?= htmlspecialchars(format_currency_vnd($order['tong_tien'])) ?></span>
                                 </div>
                             </article>
                         <?php endforeach; ?>
@@ -238,9 +462,21 @@ $orders = $stmt->fetchAll();
         </div>
     </main>
 
+    <div class="confirm-modal" id="cancel-order-modal">
+        <div class="confirm-modal__panel">
+            <h3 class="confirm-modal__title">Hủy đơn hàng</h3>
+            <p class="confirm-modal__message" data-cancel-order-message>Bạn có muốn hủy đơn hàng này không?</p>
+            <div class="confirm-modal__actions">
+                <button type="button" class="confirm-btn secondary" data-cancel-order-close>KHÔNG</button>
+                <button type="button" class="confirm-btn danger" data-confirm-cancel-order>CÓ</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="site-footer" id="site-footer"></footer>
 
-    <script src="../giohang/giohang.js?v=20260318-2"></script>
+<script src="../giohang/giohang.js?v=20260325-1"></script>
+    <script defer src="order_actions.js?v=20260324-1"></script>
     <script>
         function formatPrice(value) {
             return Number(value).toLocaleString('vi-VN') + 'đ';
@@ -291,7 +527,7 @@ $orders = $stmt->fetchAll();
                 <div class="order-footer" style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
                     <span>Tạm tính: ${formatPrice(total)}</span>
                     <div class="profile-actions" style="margin-top:0;">
-                        <a class="profile-action secondary" href="../giohang/giohang.html">Xem giỏ hàng</a>
+                        <a class="profile-action secondary" href="../giohang/giohang.php">Xem giỏ hàng</a>
                         <a class="profile-action" href="../thanhtoan/thanhtoan.php">Thanh toán</a>
                     </div>
                 </div>
@@ -301,8 +537,40 @@ $orders = $stmt->fetchAll();
             container.innerHTML = html;
         }
 
-        document.addEventListener('DOMContentLoaded', renderProfileCart);
+        document.addEventListener('DOMContentLoaded', function () {
+            const avatarInput = document.getElementById('anh_dai_dien');
+            const avatarPreview = document.getElementById('profile-avatar-preview');
+            let previewObjectUrl = null;
+
+            if (avatarInput && avatarPreview) {
+                avatarInput.addEventListener('change', function () {
+                    const [file] = this.files || [];
+                    if (!file) {
+                        return;
+                    }
+
+                    if (previewObjectUrl) {
+                        URL.revokeObjectURL(previewObjectUrl);
+                    }
+
+                    previewObjectUrl = URL.createObjectURL(file);
+                    avatarPreview.src = previewObjectUrl;
+                });
+            }
+
+            Promise.resolve(window.storeCartSyncPromise).finally(renderProfileCart);
+        });
     </script>
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+

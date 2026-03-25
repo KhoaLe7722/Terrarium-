@@ -1,9 +1,9 @@
-const tintuc = [
+﻿const tintuc = [
     {
         id: 3,
         tieude: "Cây cảnh – Tài sản quý giá cho thế hệ sau",
         image: "img__tintuc/3.jpg",
-        url: "detail.html?id=3",
+        url: "detail.php?id=3",
         pre: "Giá trị cây cảnh",
         luotxem: ""
     },
@@ -11,7 +11,7 @@ const tintuc = [
         id: 4,
         tieude: "Trồng cây kiểng – Nghề truyền thống và tài sản vô giá",
         image: "img__tintuc/4.jpg",
-        url: "detail.html?id=4",
+        url: "detail.php?id=4",
         pre: "Cây kiểng, nghề trồng cây",
         noidung: "Trồng cây kiểng, đặc biệt là các loại cây hoa, cây bonsai, đã trở thành một nghề truyền thống của nhiều gia đình nông dân. Ngoài việc tạo ra các sản phẩm đẹp mắt, cây kiểng còn có giá trị kinh tế lớn trong các dịp lễ hội.",
         luotxem: ""
@@ -20,7 +20,7 @@ const tintuc = [
         id: 5,
         tieude: "Cây cảnh và phong thủy – Bí quyết làm giàu từ cây kiểng",
         image: "img__tintuc/5.jpg",
-        url: "detail.html?id=5",
+        url: "detail.php?id=5",
         pre: "Phong thủy cây cảnh",
         luotxem: ""
     },
@@ -28,7 +28,7 @@ const tintuc = [
         id: 6,
         tieude: "Trồng cây cảnh trong nhà – Mẹo chăm sóc cây kiểng",
         image: "img__tintuc/6.jpg",
-        url: "detail.html?id=6",
+        url: "detail.php?id=6",
         pre: "Chăm sóc cây cảnh trong nhà",
         noidung: "Trồng cây cảnh trong nhà không chỉ giúp không gian sống thêm sinh động mà còn giúp làm sạch không khí. Việc chăm sóc cây kiểng đúng cách sẽ giúp cây phát triển khỏe mạnh và giữ được vẻ đẹp lâu dài.",
         luotxem: ""
@@ -37,7 +37,7 @@ const tintuc = [
         id: 7,
         tieude: "Những loại cây bonsai đẹp và dễ trồng",
         image: "img__tintuc/7.jpg",
-        url: "detail.html?id=7",
+        url: "detail.php?id=7",
         pre: "Cây bonsai",
         noidung: "Cây bonsai là một trong những loại cây cảnh được ưa chuộng nhất hiện nay. Với kỹ thuật cắt tỉa và chăm sóc tỉ mỉ, cây bonsai có thể trở thành tác phẩm nghệ thuật đẹp mắt. Những cây bonsai đẹp còn có thể bán với giá cao, trở thành nguồn thu nhập cho nhiều người trồng.",
         luotxem: ""
@@ -46,7 +46,7 @@ const tintuc = [
         id: 8,
         tieude: "Cây cảnh Tết – Một phần không thể thiếu trong mỗi gia đình",
         image: "img__tintuc/8.jpg",
-        url: "detail.html?id=8",
+        url: "detail.php?id=8",
         pre: "Cây cảnh Tết",
         luotxem: ""
     },
@@ -54,7 +54,7 @@ const tintuc = [
         id: 9,
         tieude: "Chăm sóc cây bonsai – Nghệ thuật trồng cây kiểng",
         image: "img__tintuc/9.jpg",
-        url: "detail.html?id=9",
+        url: "detail.php?id=9",
         pre: "Chăm sóc bonsai",
         noidung: "Chăm sóc cây bonsai là một nghệ thuật đòi hỏi sự kiên nhẫn và tỉ mỉ. Mỗi cây bonsai có yêu cầu về môi trường sống, ánh sáng, nước và phân bón khác nhau. Để cây bonsai đẹp và phát triển tốt, cần phải có sự chăm sóc kỹ lưỡng và đúng cách.",
         luotxem: ""
@@ -63,7 +63,7 @@ const tintuc = [
         id: 10,
         tieude: "Giới thiệu các loại cây kiểng phổ biến",
         image: "img__tintuc/10.jpg",
-        url: "detail.html?id=10",
+        url: "detail.php?id=10",
         pre: "Các loại cây kiểng",
         luotxem: ""
     },
@@ -71,7 +71,7 @@ const tintuc = [
         id: 11,
         tieude: "Cây kiểng cho không gian nội thất hiện đại",
         image: "img__tintuc/11.jpg",
-        url: "detail.html?id=11",
+        url: "detail.php?id=11",
         pre: "Cây kiểng cho nội thất",
         noidung: "Cây kiểng không chỉ giúp làm đẹp không gian mà còn có thể tạo điểm nhấn cho ngôi nhà của bạn. Cây như cây kim tiền, cây lưỡi hổ hay cây phú quý được ưa chuộng trong các không gian nội thất hiện đại nhờ vào khả năng thích ứng với môi trường trong nhà và dễ dàng chăm sóc.",
         luotxem: ""
@@ -80,7 +80,7 @@ const tintuc = [
         id: 12,
         tieude: "Thuận Phát Garden có 1 bài đăng mới",
         image: "img__tintuc/12.jpg",
-        url: "detail.html?id=12",
+        url: "detail.php?id=12",
         pre: "  Trong giấc mơ mùa hè có một khu rừng nhỏ đang thì thầm những lời thơ…✨",
         luotxem: ""
     },
@@ -88,7 +88,7 @@ const tintuc = [
         id: 13,
         tieude: "🌿 Thuận Phát Garden – Cây Kiểng Đẹp, Thiết Kế Sáng Tạo Giữa Lòng Cần Thơ",
         image: "img__tintuc/13.jpg",
-        url: "detail.html?id=13",
+        url: "detail.php?id=13",
         pre: "🎨 Thiết kế không gian cây kiểng – nghệ thuật của sự sống",
         luotxem: " "
     },
@@ -96,7 +96,7 @@ const tintuc = [
         id: 14,
         tieude: "🌱 Chất lượng sản phẩm đảm bảo – Từ vườn đến tay khách",
         image: "img__tintuc/14.jpg",
-        url: "detail.html?id=14",
+        url: "detail.php?id=14",
         pre: "",
         luotxem: " "
     },
@@ -104,7 +104,7 @@ const tintuc = [
         id: 15,
         tieude: "Cây Cảnh: Tinh Hoa Của Thiên Nhiên Trong Không Gian Sống",
         image: "img__tintuc/15.jpg",
-        url: "detail.html?id=15",
+        url: "detail.php?id=15",
         pre: "",
         luotxem: " "
     },
@@ -112,7 +112,7 @@ const tintuc = [
         id: 16,
         tieude: "🌿 Cây Cảnh Trồng Trong Nhà: Vừa Đẹp Vừa Tốt Cho Sức Khỏe",
         image: "img__tintuc/16.jpg",
-        url: "detail.html?id=16",
+        url: "detail.php?id=16",
         pre: "Trồng cây cảnh trong nhà không chỉ giúp không gian sống trở nên xanh mát, mà còn mang lại nhiều lợi ích thiết thực:",
         luotxem: " "
     },
@@ -120,7 +120,7 @@ const tintuc = [
     //     id: 0,
     //     tieude: "",
     //     image: "image: "img__tintuc/13.jpg",
-    //     url:  "detail.html?id=13",
+    //     url:  "detail.php?id=13",
     //     pre: "",
     //     luotxem: " "
     // },
@@ -364,6 +364,7 @@ function displayYeuthich__out() {
     document.getElementById("sum").textContent = Number(love.length);
 
 }
+
 
 
 

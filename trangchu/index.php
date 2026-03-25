@@ -1,11 +1,11 @@
-<?php
+﻿<?php
 require_once '../dangky_dangnhap/config.php';
 require_once '../includes/store_helpers.php';
 
 $stmt = $conn->query("
-    SELECT id, ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh
+    SELECT id, ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh, so_luong_ton
     FROM products
-    WHERE tinh_trang = 'con_hang' AND id <> 8
+    WHERE so_luong_ton > 0 AND id <> 8
     ORDER BY id ASC
 ");
 $featuredProducts = $stmt->fetchAll();
@@ -28,9 +28,9 @@ $featuredPayload = array_map(
 );
 
 $saleStmt = $conn->query("
-    SELECT id, ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh
+    SELECT id, ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh, so_luong_ton
     FROM products
-    WHERE tinh_trang = 'con_hang'
+    WHERE so_luong_ton > 0
       AND id <> 8
       AND (giam_gia_phan_tram > 0 OR (gia_goc IS NOT NULL AND gia_goc > gia))
     ORDER BY giam_gia_phan_tram DESC, (COALESCE(gia_goc, gia) - gia) DESC, id DESC
@@ -42,21 +42,21 @@ $homeNews = [
   [
     'title' => '🌿 Cây Cảnh Trồng Trong Nhà: Vừa Đẹp Vừa Tốt Cho Sức Khỏe',
     'image' => '../tintuc/img__tintuc/16.jpg',
-    'href' => '../tintuc/detail.html?id=16',
+    'href' => '../tintuc/detail.php?id=16',
     'meta' => 'Tin tức nổi bật',
     'excerpt' => 'Trồng cây cảnh trong nhà không chỉ giúp không gian sống xanh mát hơn mà còn hỗ trợ lọc không khí, giảm căng thẳng và tạo cảm giác thư thái mỗi ngày.',
   ],
   [
     'title' => '🌱 Chất lượng sản phẩm đảm bảo – Từ vườn đến tay khách',
     'image' => '../tintuc/img__tintuc/14.jpg',
-    'href' => '../tintuc/detail.html?id=14',
+    'href' => '../tintuc/detail.php?id=14',
     'meta' => 'Cam kết chất lượng',
     'excerpt' => 'Từ khâu chọn giống, chăm sóc đến đóng gói và giao cây, Thuận Phát Garden luôn kiểm soát kỹ từng công đoạn để sản phẩm đến tay khách hàng trong trạng thái tốt nhất.',
   ],
   [
     'title' => '🌿 Thuận Phát Garden – Cây Kiểng Đẹp, Thiết Kế Sáng Tạo Giữa Lòng Cần Thơ',
     'image' => '../tintuc/img__tintuc/13.jpg',
-    'href' => '../tintuc/detail.html?id=13',
+    'href' => '../tintuc/detail.php?id=13',
     'meta' => 'Không gian & cảm hứng',
     'excerpt' => 'Những thiết kế cây kiểng tại Thuận Phát Garden được chăm chút theo bố cục riêng, mang thiên nhiên đến gần hơn với nhà ở, quán cà phê và không gian làm việc hiện đại.',
   ],
@@ -80,7 +80,7 @@ $homeNews = [
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
+  <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
   <link rel="stylesheet" href="index.css?v=20260316-11" />
   <style>
     .home-featured-wrap {
@@ -1145,29 +1145,29 @@ $homeNews = [
 
 <body data-page="home">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js?v=20260318-2"></script>
-  <script defer src="../mainfont/main.js?v=20260318-2"></script>
+  <script defer src="../mainfont/layout.js?v=20260324-9"></script>
+  <script defer src="../mainfont/main.js?v=20260324-6"></script>
 
   <div class="slider">
     <div class="slides">
       <div class="slider-arrow prev"><ion-icon name="arrow-back-circle-outline"></ion-icon></div>
       <div class="slider-arrow next"><ion-icon name="arrow-forward-circle-outline"></ion-icon></div>
-      <a href="../gioithieu/gioithieu.html">
+      <a href="../gioithieu/gioithieu.php">
         <img src="../images/trangchu/TERRAIUM (1).png" alt="Giới thiệu terrarium" />
       </a>
       <a href="../sanpham/sanpham.php">
         <img src="../images/trangchu/TERRAIUM2.png" alt="Bộ sưu tập terrarium" />
       </a>
-      <a href="../tintuc/tintuc.html">
+      <a href="../tintuc/tintuc.php">
         <img src="../images/trangchu/TERRAIUM3.png" alt="Tin tức terrarium" />
       </a>
-      <a href="../tintuc/tintuc.html">
+      <a href="../tintuc/tintuc.php">
         <img src="../images/trangchu/Terrarium – nghệ thuật xanh xóa nhòa khoảng cách thế hệ, kết nối mọi lứa tuổi bằng tình yêu thiên nhiên..png" alt="Terrarium nghệ thuật xanh" />
       </a>
-      <a href="../huongdan/huongdan.html">
+      <a href="../huongdan/huongdan.php">
         <img src="../images/trangchu/TERRAIUM 5.png" alt="Hướng dẫn chăm sóc terrarium" />
       </a>
-      <a href="../gioithieu/taisaochon.html">
+      <a href="../gioithieu/taisaochon.php">
         <img src="../images/trangchu/Terrarium – chill có gu, sống có chất..png" alt="Terrarium chill có gu" />
       </a>
     </div>
@@ -1264,7 +1264,7 @@ $homeNews = [
   <section class="home-news-section" id="m_blog" aria-labelledby="home-news-title">
     <div class="home-news-shell">
       <h2 class="home-news-heading" id="home-news-title">
-        <a href="../tintuc/tintuc.html" title="Tin tức">Tin tức</a>
+        <a href="../tintuc/tintuc.php" title="Tin tức">Tin tức</a>
       </h2>
       <div class="home-news-grid">
         <?php foreach ($homeNews as $article): ?>
@@ -1614,6 +1614,14 @@ $homeNews = [
 </body>
 
 </html>
+
+
+
+
+
+
+
+
 
 
 

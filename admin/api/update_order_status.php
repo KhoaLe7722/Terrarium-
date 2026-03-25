@@ -1,34 +1,37 @@
 <?php
 require_once '../admin_check.php';
+require_once '../../includes/store_helpers.php';
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request']);
+    echo json_encode(['success' => false, 'message' => 'Yêu cầu không hợp lệ.']);
     exit;
 }
 
-$data = json_decode(file_get_contents('php://input'), true);
-$id = $data['id'] ?? 0;
-$status = $data['status'] ?? '';
-
-if (!$id || !$status) {
-    echo json_encode(['success' => false, 'message' => 'Thiếu dữ liệu']);
-    exit;
+$payload = json_decode(file_get_contents('php://input'), true);
+if (!is_array($payload)) {
+    $payload = [];
 }
 
-$validStatuses = ['cho_xac_nhan', 'dang_xu_ly', 'dang_giao', 'da_giao', 'da_huy'];
-if (!in_array($status, $validStatuses)) {
-    echo json_encode(['success' => false, 'message' => 'Trạng thái không hợp lệ']);
+$id = (int) ($payload['id'] ?? $_POST['id'] ?? $_POST['order_id'] ?? 0);
+$status = trim((string) ($payload['status'] ?? $_POST['status'] ?? ''));
+
+if ($id <= 0 || $status === '') {
+    echo json_encode(['success' => false, 'message' => 'Thiếu dữ liệu.']);
     exit;
 }
 
 try {
-    $stmt = $conn->prepare("UPDATE orders SET trang_thai = ? WHERE id = ?");
-    $stmt->execute([$status, $id]);
-
-    echo json_encode(['success' => true]);
-
-} catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Lỗi DB: ' . $e->getMessage()]);
+    $result = change_order_status_with_inventory($conn, $id, $status);
+    echo json_encode([
+        'success' => true,
+        'changed' => (bool) ($result['changed'] ?? true),
+    ]);
+} catch (Throwable $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage(),
+    ]);
 }
+?>

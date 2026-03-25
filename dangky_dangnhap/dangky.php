@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_id'] = (int) $conn->lastInsertId();
                 $_SESSION['user_name'] = $name;
                 $_SESSION['user_email'] = $email;
+                $_SESSION['user_avatar'] = null;
                 $_SESSION['user_role'] = 'khach';
 
                 header('Location: ' . $redirectTarget);
@@ -70,14 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
-    <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2" />
-    <link rel="stylesheet" href="dangky_dangnhap.css" />
+    <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
+    <link rel="stylesheet" href="dangky_dangnhap.css?v=20260324-1" />
 </head>
 
 <body data-page="login">
     <nav class="navigation" id="main-nav"></nav>
-    <script defer src="../mainfont/layout.js?v=20260318-2"></script>
-    <script defer src="../mainfont/main.js?v=20260318-2"></script>
+    <script defer src="../mainfont/layout.js?v=20260324-9"></script>
+    <script defer src="../mainfont/main.js?v=20260324-6"></script>
 
     <main class="body__main body__main__logout">
         <div class="auth-form">
@@ -115,15 +116,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="auth-form__group">
                             <label for="password" class="form-label">Mật khẩu</label>
-                            <input id="password" name="password" type="password" class="auth-form__input"
-                                placeholder="Ít nhất 8 ký tự" required />
+                            <div class="auth-form__password-wrap">
+                                <input id="password" name="password" type="password" class="auth-form__input auth-form__input--password"
+                                    placeholder="Ít nhất 8 ký tự" required />
+                                <button
+                                    type="button"
+                                    class="auth-form__toggle-password"
+                                    data-toggle-password
+                                    data-target="password"
+                                    aria-label="Hiện mật khẩu"
+                                    aria-pressed="false">
+                                    <i class="far fa-eye-slash" aria-hidden="true"></i>
+                                </button>
+                            </div>
                             <small id="feedback-password" class="form-message"></small>
                         </div>
 
                         <div class="auth-form__group">
                             <label for="confirm_password" class="form-label">Xác nhận mật khẩu</label>
-                            <input id="confirm_password" name="confirm_password" type="password"
-                                class="auth-form__input" placeholder="Nhập lại mật khẩu" required />
+                            <div class="auth-form__password-wrap">
+                                <input id="confirm_password" name="confirm_password" type="password"
+                                    class="auth-form__input auth-form__input--password" placeholder="Nhập lại mật khẩu" required />
+                                <button
+                                    type="button"
+                                    class="auth-form__toggle-password"
+                                    data-toggle-password
+                                    data-target="confirm_password"
+                                    aria-label="Hiện mật khẩu"
+                                    aria-pressed="false">
+                                    <i class="far fa-eye-slash" aria-hidden="true"></i>
+                                </button>
+                            </div>
                             <small id="feedback-confirm_password" class="form-message"></small>
                         </div>
                     </div>
@@ -138,7 +161,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
 
     <footer class="site-footer" id="site-footer"></footer>
-    <script src="dangky.js"></script>
+    <script src="dangky.js?v=20260324-2"></script>
 </body>
 
 </html>
+
+
+
+
+
+
+
+

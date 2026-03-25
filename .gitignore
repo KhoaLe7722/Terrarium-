@@ -1,2 +1,3 @@
 .chrome-headless/
 .env
+backups/

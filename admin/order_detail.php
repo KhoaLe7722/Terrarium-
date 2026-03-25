@@ -20,6 +20,7 @@ $stmt = $conn->prepare("
         o.tong_tien,
         o.trang_thai,
         o.ngay_dat,
+        o.phuong_thuc_tt,
         u.ho_ten AS ten_tai_khoan,
         u.email AS email_tai_khoan,
         u.so_dien_thoai AS sdt_tai_khoan,
@@ -62,6 +63,13 @@ $statuses = [
     'da_huy' => ['Đã hủy', 'danger'],
 ];
 
+$paymentMethods = [
+    'cod' => 'Thanh toán khi nhận hàng (COD)',
+    'bank' => 'Chuyển khoản ngân hàng',
+    'momo' => 'Thanh toán qua momo'
+];
+
+
 $statusMeta = $statuses[$order['trang_thai']] ?? ['Không xác định', 'info'];
 $displayPhone = $order['sdt_kh'] ?: ($order['sdt_tai_khoan'] ?: 'Chưa cập nhật');
 $displayAddress = $order['dia_chi_giao'] ?: ($order['dia_chi_tai_khoan'] ?: 'Chưa cập nhật');
@@ -70,6 +78,7 @@ $displayAccountEmail = $order['email_tai_khoan'] ?: $order['email_kh'];
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -79,6 +88,7 @@ $displayAccountEmail = $order['email_tai_khoan'] ?: $order['email_kh'];
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="admin.css">
 </head>
+
 <body>
 
     <?php include 'components/sidebar.php'; ?>
@@ -148,18 +158,21 @@ $displayAccountEmail = $order['email_tai_khoan'] ?: $order['email_kh'];
                                                 <td>
                                                     <div class="item-media">
                                                         <img src="../<?= htmlspecialchars($item['hinh_chinh'] ?? 'images/avatar.png') ?>"
-                                                             alt="<?= htmlspecialchars($item['ten_sp']) ?>"
-                                                             class="product-thumb"
-                                                             onerror="this.onerror=null;this.src='../images/avatar.png';">
+                                                            alt="<?= htmlspecialchars($item['ten_sp']) ?>" class="product-thumb"
+                                                            onerror="this.onerror=null;this.src='../images/avatar.png';">
                                                         <div>
-                                                            <div style="font-weight: 600;"><?= htmlspecialchars($item['ten_sp']) ?></div>
-                                                            <div style="font-size: 12px; color: var(--text-muted);">Mã SP #<?= (int) $item['product_id'] ?></div>
+                                                            <div style="font-weight: 600;">
+                                                                <?= htmlspecialchars($item['ten_sp']) ?>
+                                                            </div>
+                                                            <div style="font-size: 12px; color: var(--text-muted);">Mã SP
+                                                                #<?= (int) $item['product_id'] ?></div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td><?= number_format((float) $item['gia'], 0, ',', '.') ?>đ</td>
                                                 <td>x<?= (int) $item['so_luong'] ?></td>
-                                                <td><strong><?= number_format((float) $item['thanh_tien'], 0, ',', '.') ?>đ</strong></td>
+                                                <td><strong><?= number_format((float) $item['thanh_tien'], 0, ',', '.') ?>đ</strong>
+                                                </td>
                                                 <td>
                                                     <?php if (($item['tinh_trang'] ?? '') === 'het_hang'): ?>
                                                         <span class="badge badge-danger">Hết hàng</span>
@@ -242,8 +255,9 @@ $displayAccountEmail = $order['email_tai_khoan'] ?: $order['email_kh'];
                                     <strong><?= number_format((float) $order['tong_tien'], 0, ',', '.') ?>đ</strong>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="detail-label">Tình trạng hiện có</span>
-                                    <strong><?= $order['trang_thai'] === 'da_giao' ? 'Đơn đã giao' : 'Chưa có cột thanh toán riêng' ?></strong>
+                                    <span class="detail-label">Phương thức thanh toán</span>
+                                    <strong
+                                        style="color: #54794a;"><?= $paymentMethods[$order['phuong_thuc_tt']] ?? strtoupper($order['phuong_thuc_tt'] ?: 'Chưa xác định') ?></strong>
                                 </div>
                                 <div class="detail-item">
                                     <span class="detail-label">Ghi chú khách hàng</span>
@@ -259,4 +273,5 @@ $displayAccountEmail = $order['email_tai_khoan'] ?: $order['email_kh'];
 
     <script src="admin.js"></script>
 </body>
+
 </html>

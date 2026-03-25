@@ -6,41 +6,41 @@ $message = '';
 $messageType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $ten_sp = trim($_POST['ten_sp'] ?? '');
-    $gia = str_replace('.', '', $_POST['gia'] ?? '0');
-    $gia_goc = str_replace('.', '', $_POST['gia_goc'] ?? '0');
-    $giam_gia_phan_tram = intval($_POST['giam_gia_phan_tram'] ?? 0);
-    $tinh_trang = $_POST['tinh_trang'] ?? 'con_hang';
-    $mo_ta = $_POST['mo_ta'] ?? '';
-    
-    if ($gia_goc == '' || $gia_goc == '0') {
-        $gia_goc = $gia; // Nếu không nhập giá gốc, coi giá bán là giá gốc
+    $tenSp = trim((string) ($_POST['ten_sp'] ?? ''));
+    $gia = str_replace('.', '', (string) ($_POST['gia'] ?? '0'));
+    $giaGoc = str_replace('.', '', (string) ($_POST['gia_goc'] ?? '0'));
+    $giamGiaPhanTram = (int) ($_POST['giam_gia_phan_tram'] ?? 0);
+    $soLuongTon = max(0, (int) ($_POST['so_luong_ton'] ?? 0));
+    $ngayBaoTriGanNhat = trim((string) ($_POST['ngay_bao_tri_gan_nhat'] ?? ''));
+    $ngayBaoTriGanNhat = $ngayBaoTriGanNhat !== '' ? $ngayBaoTriGanNhat : null;
+    $tinhTrang = $soLuongTon > 0 ? 'con_hang' : 'het_hang';
+    $moTa = (string) ($_POST['mo_ta'] ?? '');
+
+    if ($giaGoc === '' || $giaGoc === '0') {
+        $giaGoc = $gia;
     }
 
-    // Nếu có % giảm giá, tính lại giá bán
-    if ($giam_gia_phan_tram > 0) {
-        $gia = $gia_goc * (1 - $giam_gia_phan_tram / 100);
-    } else {
-        // Nếu không có % giảm giá, giá bán là giá nhập vào
-        // Trường hợp này có thể gia_goc vẫn > gia nếu nhập tay, 
-        // nhưng user muốn theo % là chính.
+    if ($giamGiaPhanTram > 0) {
+        $gia = $giaGoc * (1 - $giamGiaPhanTram / 100);
     }
 
-    if (empty($ten_sp) || empty($gia_goc)) {
-        $message = 'Vui lòng nhập tên và giá gốc/giá bán!';
+    if ($tenSp === '' || $giaGoc === '' || $giaGoc === '0') {
+        $message = 'Vui lòng nhập tên sản phẩm và giá bán.';
         $messageType = 'error';
     } else {
-        // Upload ảnh chính
-        $hinh_chinh = null;
+        $hinhChinh = null;
         if (isset($_FILES['hinh_chinh']) && $_FILES['hinh_chinh']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = '../uploads/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-            
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
             $fileInfo = pathinfo($_FILES['hinh_chinh']['name']);
-            $filename = uniqid('sp_') . '.' . $fileInfo['extension'];
-            
-            if (move_uploaded_file($_FILES['hinh_chinh']['tmp_name'], $uploadDir . $filename)) {
-                $hinh_chinh = 'uploads/' . $filename;
+            $extension = $fileInfo['extension'] ?? 'jpg';
+            $fileName = uniqid('sp_', true) . '.' . $extension;
+
+            if (move_uploaded_file($_FILES['hinh_chinh']['tmp_name'], $uploadDir . $fileName)) {
+                $hinhChinh = 'uploads/' . $fileName;
             }
         }
 
@@ -48,25 +48,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $conn->beginTransaction();
 
             $stmt = $conn->prepare("
-                INSERT INTO products (ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh, mo_ta, tinh_trang)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO products (
+                    ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh, mo_ta,
+                    so_luong_ton, ngay_bao_tri_gan_nhat, tinh_trang
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$ten_sp, $gia, $gia_goc, $giam_gia_phan_tram, $hinh_chinh, $mo_ta, $tinh_trang]);
-            $productId = $conn->lastInsertId();
+            $stmt->execute([
+                $tenSp,
+                $gia,
+                $giaGoc,
+                $giamGiaPhanTram,
+                $hinhChinh,
+                $moTa,
+                $soLuongTon,
+                $ngayBaoTriGanNhat,
+                $tinhTrang,
+            ]);
 
-            // Xử lý tải lên nhiều ảnh phụ
+            $productId = (int) $conn->lastInsertId();
+
             if (isset($_FILES['thu_vien_anh'])) {
                 $uploadDir = '../uploads/';
                 foreach ($_FILES['thu_vien_anh']['tmp_name'] as $key => $tmpName) {
-                    if ($_FILES['thu_vien_anh']['error'][$key] === UPLOAD_ERR_OK) {
-                        $fileInfo = pathinfo($_FILES['thu_vien_anh']['name'][$key]);
-                        $filename = uniqid('gallery_') . '_' . $key . '.' . $fileInfo['extension'];
-                        
-                        if (move_uploaded_file($tmpName, $uploadDir . $filename)) {
-                            $imgPath = 'uploads/' . $filename;
-                            $stmt = $conn->prepare("INSERT INTO product_images (product_id, duong_dan) VALUES (?, ?)");
-                            $stmt->execute([$productId, $imgPath]);
-                        }
+                    if (($_FILES['thu_vien_anh']['error'][$key] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                        continue;
+                    }
+
+                    $fileInfo = pathinfo($_FILES['thu_vien_anh']['name'][$key]);
+                    $extension = $fileInfo['extension'] ?? 'jpg';
+                    $fileName = uniqid('gallery_', true) . '_' . $key . '.' . $extension;
+
+                    if (move_uploaded_file($tmpName, $uploadDir . $fileName)) {
+                        $imgPath = 'uploads/' . $fileName;
+                        $galleryStmt = $conn->prepare("INSERT INTO product_images (product_id, duong_dan) VALUES (?, ?)");
+                        $galleryStmt->execute([$productId, $imgPath]);
                     }
                 }
             }
@@ -75,7 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: products.php?msg=add_success');
             exit;
         } catch (PDOException $e) {
-            $conn->rollBack();
+            if ($conn->inTransaction()) {
+                $conn->rollBack();
+            }
             $message = 'Lỗi lưu dữ liệu: ' . $e->getMessage();
             $messageType = 'error';
         }
@@ -87,12 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $pageTitle ?> | Admin Thuận Phát Garden</title>
+    <title><?= htmlspecialchars($pageTitle) ?> | Admin Thuận Phát Garden</title>
     <link rel="icon" href="../images/avatar.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="admin.css">
-    <!-- Summernote cho mô tả (Tùy chọn) -->
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
 </head>
 <body>
@@ -109,31 +126,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <?php if ($message): ?>
-                <div class="alert alert-error">
-                    <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($message) ?>
+                <div class="alert alert-<?= $messageType === 'success' ? 'success' : 'error' ?>">
+                    <i class="fas fa-<?= $messageType === 'success' ? 'check-circle' : 'exclamation-circle' ?>"></i>
+                    <?= htmlspecialchars($message) ?>
                 </div>
             <?php endif; ?>
 
-            <div class="card" style="max-width: 800px;">
+            <div class="card" style="max-width: 860px;">
                 <div class="card-body">
                     <form action="add_product.php" method="POST" enctype="multipart/form-data">
                         <div class="form-group">
                             <label for="ten_sp">Tên sản phẩm <span style="color:red">*</span></label>
-                            <input type="text" id="ten_sp" name="ten_sp" class="form-control" required 
-                                   value="<?= htmlspecialchars($_POST['ten_sp'] ?? '') ?>">
+                            <input
+                                type="text"
+                                id="ten_sp"
+                                name="ten_sp"
+                                class="form-control"
+                                required
+                                value="<?= htmlspecialchars($_POST['ten_sp'] ?? '') ?>">
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="gia_goc">Giá bán (VNĐ) <span style="color:red">*</span></label>
-                                <input type="text" id="gia_goc" name="gia_goc" class="form-control currency-input" required 
-                                       value="<?= htmlspecialchars($_POST['gia_goc'] ?? '') ?>" placeholder="Ví dụ: 200.000">
-                                <div class="form-hint">Đây là giá gốc của sản phẩm.</div>
+                                <label for="gia_goc">Giá gốc (VNĐ) <span style="color:red">*</span></label>
+                                <input
+                                    type="text"
+                                    id="gia_goc"
+                                    name="gia_goc"
+                                    class="form-control currency-input"
+                                    required
+                                    value="<?= htmlspecialchars($_POST['gia_goc'] ?? '') ?>"
+                                    placeholder="Ví dụ: 200.000">
+                                <div class="form-hint">Đây là giá trước khi áp dụng giảm giá.</div>
                             </div>
                             <div class="form-group">
                                 <label for="giam_gia_phan_tram">Giảm giá (%)</label>
-                                <input type="number" id="giam_gia_phan_tram" name="giam_gia_phan_tram" class="form-control" min="0" max="100"
-                                       value="<?= htmlspecialchars($_POST['giam_gia_phan_tram'] ?? '0') ?>">
+                                <input
+                                    type="number"
+                                    id="giam_gia_phan_tram"
+                                    name="giam_gia_phan_tram"
+                                    class="form-control"
+                                    min="0"
+                                    max="100"
+                                    value="<?= htmlspecialchars($_POST['giam_gia_phan_tram'] ?? '0') ?>">
                                 <div class="form-hint">Nhập 0 nếu không giảm giá.</div>
                             </div>
                             <div class="form-group">
@@ -145,11 +180,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="tinh_trang">Tình trạng</label>
-                                <select id="tinh_trang" name="tinh_trang" class="form-control">
-                                    <option value="con_hang">Còn hàng</option>
-                                    <option value="het_hang">Hết hàng</option>
-                                </select>
+                                <label for="so_luong_ton">Số lượng còn <span style="color:red">*</span></label>
+                                <input
+                                    type="number"
+                                    id="so_luong_ton"
+                                    name="so_luong_ton"
+                                    class="form-control"
+                                    min="0"
+                                    required
+                                    value="<?= htmlspecialchars($_POST['so_luong_ton'] ?? '0') ?>">
+                                <div class="form-hint">Bằng 0 sẽ tự động hiện hết hàng trên web.</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ngay_bao_tri_gan_nhat">Ngày bảo trì gần nhất</label>
+                                <input
+                                    type="date"
+                                    id="ngay_bao_tri_gan_nhat"
+                                    name="ngay_bao_tri_gan_nhat"
+                                    class="form-control"
+                                    value="<?= htmlspecialchars($_POST['ngay_bao_tri_gan_nhat'] ?? '') ?>">
+                                <div class="form-hint">Hệ thống sẽ nhắc admin khi sản phẩm sắp đến chu kỳ 2 tháng.</div>
                             </div>
                             <div class="form-group">
                                 <label for="hinh_chinh">Ảnh đại diện</label>
@@ -159,11 +209,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         <div class="gallery-section">
-                            <label>Thư viện ảnh sản phẩm (Nhiều ảnh)</label>
+                            <label>Thư viện ảnh sản phẩm (nhiều ảnh)</label>
                             <input type="file" id="thu_vien_anh" name="thu_vien_anh[]" class="form-control" accept="image/*" multiple style="padding: 7px 10px; margin-top: 8px;">
-                            <div id="galleryPreview" class="gallery-grid">
-                                <!-- Previews will appear here -->
-                            </div>
+                            <div id="galleryPreview" class="gallery-grid"></div>
                         </div>
 
                         <div class="form-group">
@@ -206,12 +254,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             function calculatePrice() {
                 const giaGocStr = $('#gia_goc').val().replace(/\./g, '');
-                const giaGoc = parseInt(giaGocStr) || 0;
-                const phanTram = parseInt($('#giam_gia_phan_tram').val()) || 0;
-                
+                const giaGoc = parseInt(giaGocStr, 10) || 0;
+                const phanTram = parseInt($('#giam_gia_phan_tram').val(), 10) || 0;
                 const giaGiam = giaGoc * (1 - phanTram / 100);
+
                 $('#gia_hien_thi').val(new Intl.NumberFormat('vi-VN').format(giaGiam) + ' đ');
-                $('#gia_fixed').val(giaGiam);
+                $('#gia_fixed').val(Math.round(giaGiam));
             }
 
             $('#gia_goc, #giam_gia_phan_tram').on('input', calculatePrice);

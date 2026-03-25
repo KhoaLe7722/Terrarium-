@@ -111,6 +111,49 @@ main.body__main {
   border-color: var(--primary-color);
 }
 
+.auth-form__password-wrap {
+  position: relative;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.auth-form__password-wrap .auth-form__input {
+  margin-top: 0;
+}
+
+.auth-form__input--password {
+  padding-right: 48px;
+}
+
+.auth-form__toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #54794a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.auth-form__toggle-password:hover,
+.auth-form__toggle-password:focus-visible {
+  background: rgba(84, 121, 74, 0.12);
+  color: #2f4f29;
+  outline: none;
+}
+
+.auth-form__toggle-password i {
+  font-size: 1.6rem;
+}
+
 .form-message {
   font-size: 1.2rem;
   color: red;

@@ -51,3 +51,25 @@ App van giu fallback ve:
 - Database: `terrarium_db`
 
 Neu khong dat bien moi truong, project van tiep tuc chay theo kieu XAMPP nhu truoc.
+
+## Backup va recovery cho XAMPP
+
+Neu ban van chay bang XAMPP, nen backup dinh ky truoc khi restart may hoac tat XAMPP:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\mysql-backup.ps1
+```
+
+Khi can restore lai du lieu tu backup:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\mysql-restore.ps1 -BackupDir .\backups\mysql\<timestamp>
+```
+
+Neu gap loi kieu `Aria recovery failed` hoac `global_priv` bi hong trong XAMPP:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\xampp-mysql-repair.ps1 -StartAfterRepair
+```
+
+Xem them tai lieu chi tiet tai `docs/xampp-mysql-recovery.md`.

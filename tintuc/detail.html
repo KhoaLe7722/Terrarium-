@@ -1,94 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="../images/avatar.png" type="image/png" />
-  <title>Terrarium Cần Thơ | Thuận Phát G Garden</title>
-  <link rel="stylesheet" href="tintuc__detail.css">
-
-  <!-- Ionicons -->
-  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="../mainfont/main.css?v=20260318-2">
-  <link rel="stylesheet" href="detail.css">
-  <link rel="stylesheet" href="tintuc.css">
+  <meta charset="UTF-8" />
+  <script>
+    var search = window.location.search || "";
+    window.location.replace("detail.php" + search);
+  </script>
+  <meta http-equiv="refresh" content="0;url=detail.php" />
+  <title>Đang chuyển trang...</title>
 </head>
-
-<body data-page="news">
-  <nav class="navigation" id="main-nav"></nav>
-  <!-- JS -->
-  <script defer src="../mainfont/layout.js?v=20260318-2"></script>
-  <script defer src="../mainfont/main.js?v=20260318-2"></script>
-
-
-  <div class="page">
-    <div id="icon_box">
-      <a href="tintuc.html"> <i class="fa-solid fa-house"></i></a>
-      <a href="mailto:?subject=Check out this page&body=I thought you might find this page interesting: https://www.example.com"
-        target="_blank"><i class="fa-solid fa-envelope"></i></a>
-
-      <i id="like" class="fa-solid fa-heart"></i>
-    </div>
-    <div class="flex__container">
-      <div class="side">
-        <div class="danhmuctintuc">
-          Tin tức liên quan
-        </div>
-        <div id="tintuclienquan__container"></div>
-
-
-
-      </div>
-      <div class="main__contain" id="thechua">
-        <h1 id="title"></h1>
-        <img src="" alt="" id="img" class="imgs">
-        <p id="content" class="contents"></p>
-
-      </div>
-
-
-
-    </div>
-    <div class="comment--space">
-      <button id="btn__themmoi" class="open"><i class="fa-solid fa-comment"></i></button>
-      <div id="blcuaban">
-        <p>🌿Bình luận của bạn</p>
-      </div>
-      <form action="" id="comment__form">
-        <div class="control-input">
-          <input id="name" type="text" class="form-input" placeholder="Nhập tên của bạn.">
-          <span class="control-noti"></span>
-        </div>
-
-        <div class="control-input">
-          <textarea id="comment__content" class="form-input" placeholder="Bình luận ở đây."></textarea>
-          <span class="control-noti"></span>
-        </div>
-        <div class="control-input">
-          <button id="form_daidien" type="button" onclick="alert('Conming Soon!')">Chọn icon đại diện</button>
-          <button id="form-submit" type="submit">Bình luận</button>
-          <span id="daidien_space"></span>
-        </div>
-      </form>
-
-      <p id="notification"></p>
-      <div class="comment--box" id="comment__box__id">
-        <div id="comment__bl__id"></div>
-        <!-- comen o day -->
-      </div>
-    </div>
-
-  </div>
-  <script src="detail.js?v=20260318-3"></script>
-
-  <!-- Footer -->
-  <footer class="site-footer" id="site-footer"></footer>
-
-</body>
-
+<body></body>
 </html>
