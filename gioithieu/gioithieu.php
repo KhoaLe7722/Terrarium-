@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 
 <head>
@@ -13,14 +13,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
+<link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
   <link rel="stylesheet" href="gioithieu.css">
 </head>
 
 <body data-page="about">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js?v=20260324-9"></script>
-  <script defer src="../mainfont/main.js?v=20260324-6"></script>
+<script defer src="../mainfont/layout.js?v=20260329-4"></script>
+  <script defer src="../mainfont/main.js?v=20260329-2"></script>
   <script defer src="gioithieu.js"></script>
 
   <div class="page-header">
@@ -84,6 +84,7 @@
 </body>
 
 </html>
+
 
 
 

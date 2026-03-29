@@ -271,9 +271,290 @@ function initNavigation() {
   // ==== Hamburger Menu Toggle ====
   var hamburgerBtn = document.getElementById('hamburger-btn');
   var navMenu = document.getElementById('nav-menu');
+  var searchToggle = nav.querySelector('#search-toggle');
+  var searchForm = nav.querySelector('#header-search-form');
+  var searchInput = searchForm ? searchForm.querySelector('.header-search-input') : null;
+  var searchLoader = nav.querySelector('#header-search-loader');
+  var searchDropdown = nav.querySelector('#header-search-dropdown');
+  var searchTimer = null;
+  var searchRequestId = 0;
+  var searchController = null;
+
+  if (window.headerSearchCleanup) {
+    window.headerSearchCleanup();
+    window.headerSearchCleanup = null;
+  }
+
+  function setSearchLoading(isLoading) {
+    if (searchLoader) {
+      searchLoader.hidden = !isLoading;
+    }
+
+    if (searchForm) {
+      searchForm.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+    }
+  }
+
+  function closeSearchDropdown() {
+    if (!searchDropdown) return;
+
+    searchDropdown.hidden = true;
+    searchDropdown.innerHTML = '';
+  }
+
+  function buildSearchResultsUrl(query) {
+    return STORE_PATHS.products + '?q=' + encodeURIComponent(query);
+  }
+
+  function renderSearchDropdown(html) {
+    if (!searchDropdown) return;
+
+    searchDropdown.innerHTML = html;
+    searchDropdown.hidden = false;
+  }
+
+  function renderSearchState(message, query, actionLabel) {
+    var safeMessage = typeof escapeHtml === 'function'
+      ? escapeHtml(message)
+      : String(message);
+    var safeActionLabel = typeof escapeHtml === 'function'
+      ? escapeHtml(actionLabel || 'Xem tất cả kết quả')
+      : String(actionLabel || 'Xem tất cả kết quả');
+    var html = '<p class="header-search-state">' + safeMessage + '</p>';
+
+    if (query) {
+      html += '<a class="header-search-view-all" href="' + buildSearchResultsUrl(query) + '">' + safeActionLabel + '</a>';
+    }
+
+    renderSearchDropdown(html);
+  }
+
+  function renderSearchResults(data, query) {
+    var items = data && Array.isArray(data.items) ? data.items : [];
+
+    if (!items.length) {
+      renderSearchState('Không tìm thấy sản phẩm phù hợp với từ khóa này.', query, 'Xem trang sản phẩm');
+      return;
+    }
+
+    var html = items.map(function (item) {
+      var safeName = typeof escapeHtml === 'function' ? escapeHtml(item.name || '') : (item.name || '');
+      var safeImage = typeof escapeHtml === 'function' ? escapeHtml(item.image || '../images/avatar.png') : (item.image || '../images/avatar.png');
+      var safeLink = typeof escapeHtml === 'function' ? escapeHtml(item.link || buildSearchResultsUrl(query)) : (item.link || buildSearchResultsUrl(query));
+      var safePrice = typeof escapeHtml === 'function' ? escapeHtml(item.priceText || '') : (item.priceText || '');
+      var safeOldPrice = item.originalPriceText
+        ? '<span class="header-search-price-old">' + (typeof escapeHtml === 'function' ? escapeHtml(item.originalPriceText) : item.originalPriceText) + '</span>'
+        : '';
+      var stockClass = item.inStock ? '' : ' is-out';
+      var safeStock = typeof escapeHtml === 'function' ? escapeHtml(item.stockText || '') : (item.stockText || '');
+
+      return '' +
+        '<a class="header-search-result" href="' + safeLink + '">' +
+        '<span class="header-search-thumb">' +
+        '<img src="' + safeImage + '" alt="' + safeName + '" onerror="this.onerror=null;this.src=\'../images/avatar.png\';">' +
+        '</span>' +
+        '<span class="header-search-info">' +
+        '<span class="header-search-name">' + safeName + '</span>' +
+        '<span class="header-search-meta">' +
+        '<span class="header-search-price">' + safePrice + '</span>' +
+        safeOldPrice +
+        '</span>' +
+        '<span class="header-search-stock' + stockClass + '">' + safeStock + '</span>' +
+        '</span>' +
+        '</a>';
+    }).join('');
+
+    html += '<a class="header-search-view-all" href="' + buildSearchResultsUrl(query) + '">Xem tất cả kết quả</a>';
+    renderSearchDropdown(html);
+  }
+
+  function performProductSearch(query) {
+    if (!searchDropdown || !STORE_PATHS.searchApi) return;
+
+    if (searchController && typeof searchController.abort === 'function') {
+      searchController.abort();
+    }
+
+    searchController = typeof AbortController === 'function' ? new AbortController() : null;
+    searchRequestId += 1;
+    var requestId = searchRequestId;
+    var requestBody = new URLSearchParams();
+    requestBody.set('search', query);
+
+    setSearchLoading(true);
+
+    fetch(STORE_PATHS.searchApi, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Accept': 'application/json'
+      },
+      body: requestBody.toString(),
+      signal: searchController ? searchController.signal : undefined
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('Search request failed');
+        }
+
+        return response.json();
+      })
+      .then(function (data) {
+        if (requestId !== searchRequestId) {
+          return;
+        }
+
+        renderSearchResults(data, query);
+      })
+      .catch(function (error) {
+        if (error && error.name === 'AbortError') {
+          return;
+        }
+
+        renderSearchState('Tạm thời chưa tìm được sản phẩm. Vui lòng thử lại.', query, 'Mở trang sản phẩm');
+      })
+      .finally(function () {
+        if (requestId === searchRequestId) {
+          setSearchLoading(false);
+        }
+      });
+  }
+
+  function scheduleProductSearch() {
+    if (!searchInput) return;
+
+    var query = searchInput.value.trim();
+    clearTimeout(searchTimer);
+
+    if (!query) {
+      searchRequestId += 1;
+      if (searchController && typeof searchController.abort === 'function') {
+        searchController.abort();
+      }
+      setSearchLoading(false);
+      closeSearchDropdown();
+      return;
+    }
+
+    if (query.length < 2) {
+      searchRequestId += 1;
+      if (searchController && typeof searchController.abort === 'function') {
+        searchController.abort();
+      }
+      setSearchLoading(false);
+      renderSearchState('Nhập ít nhất 2 ký tự để tìm kiếm.', query, 'Xem trang sản phẩm');
+      return;
+    }
+
+    searchTimer = setTimeout(function () {
+      performProductSearch(query);
+    }, 500);
+  }
+
+  function setSearchOpen(isOpen) {
+    if (!searchToggle || !searchForm) return;
+
+    var shouldOpen = !!isOpen && window.innerWidth <= 768;
+    nav.classList.toggle('search-open', shouldOpen);
+    searchToggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+
+    if (!shouldOpen) {
+      closeSearchDropdown();
+    }
+
+    if (shouldOpen) {
+      if (hamburgerBtn && navMenu) {
+        hamburgerBtn.classList.remove('active');
+        navMenu.classList.remove('menu-open');
+      }
+
+      if (searchInput) {
+        setTimeout(function () {
+          searchInput.focus();
+        }, 0);
+      }
+    }
+  }
+
+  if (searchToggle && searchForm) {
+    var closeHeaderSearch = function (e) {
+      if (window.innerWidth > 768) {
+        setSearchOpen(false);
+        return;
+      }
+
+      if (!searchForm.contains(e.target) && !searchToggle.contains(e.target)) {
+        setSearchOpen(false);
+      }
+    };
+
+    var closeHeaderSearchOnEscape = function (e) {
+      if (e.key === 'Escape') {
+        setSearchOpen(false);
+      }
+    };
+
+    var handleSearchResize = function () {
+      if (window.innerWidth > 768) {
+        nav.classList.remove('search-open');
+        searchToggle.setAttribute('aria-expanded', 'false');
+      }
+    };
+
+    searchToggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      setSearchOpen(!nav.classList.contains('search-open'));
+    });
+
+    searchForm.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+
+    searchForm.addEventListener('input', function (e) {
+      if (e.target === searchInput) {
+        scheduleProductSearch();
+      }
+    });
+
+    searchInput.addEventListener('focus', function () {
+      if (searchInput.value.trim().length >= 2) {
+        scheduleProductSearch();
+      }
+    });
+
+    searchForm.addEventListener('submit', function () {
+      clearTimeout(searchTimer);
+      searchRequestId += 1;
+      if (searchController && typeof searchController.abort === 'function') {
+        searchController.abort();
+      }
+      setSearchLoading(false);
+      closeSearchDropdown();
+      setSearchOpen(false);
+    });
+
+    document.addEventListener('click', closeHeaderSearch);
+    document.addEventListener('keydown', closeHeaderSearchOnEscape);
+    window.addEventListener('resize', handleSearchResize);
+    window.headerSearchCleanup = function () {
+      clearTimeout(searchTimer);
+      if (searchController && typeof searchController.abort === 'function') {
+        searchController.abort();
+      }
+      document.removeEventListener('click', closeHeaderSearch);
+      document.removeEventListener('keydown', closeHeaderSearchOnEscape);
+      window.removeEventListener('resize', handleSearchResize);
+    };
+  }
 
   if (hamburgerBtn && navMenu) {
     hamburgerBtn.addEventListener('click', function () {
+      if (!navMenu.classList.contains('menu-open')) {
+        setSearchOpen(false);
+      }
+
       hamburgerBtn.classList.toggle('active');
       navMenu.classList.toggle('menu-open');
     });

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 
 <head>
@@ -17,15 +17,15 @@
 
 
   <!-- CSS -->
-  <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
+<link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
   <link rel="stylesheet" href="gioithieu.css">
 </head>
 
 <body data-page="about">
   <nav class="navigation" id="main-nav"></nav>
   <!-- JS -->
-  <script defer src="../mainfont/layout.js?v=20260324-9"></script>
-  <script defer src="../mainfont/main.js?v=20260324-6"></script>
+<script defer src="../mainfont/layout.js?v=20260329-4"></script>
+  <script defer src="../mainfont/main.js?v=20260329-2"></script>
 
   <!--Phần code của từng trang-->
   <main class="page-main">
@@ -181,6 +181,7 @@
 <footer class="site-footer" id="site-footer"></footer>
 
 </html>
+
 
 
 

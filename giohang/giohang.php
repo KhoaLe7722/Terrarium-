@@ -13,14 +13,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
-  <link rel="stylesheet" href="giohangchitiet.css?v=20260325-1">
+<link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
+  <link rel="stylesheet" href="giohangchitiet.css?v=20260329-2">
 </head>
 
 <body data-page="cart">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js?v=20260324-9"></script>
-  <script defer src="../mainfont/main.js?v=20260324-6"></script>
+<script defer src="../mainfont/layout.js?v=20260329-4"></script>
+  <script defer src="../mainfont/main.js?v=20260329-2"></script>
 
   <main class="cart-container">
     <section class="cart-card" id="cart-popup">
@@ -50,6 +50,17 @@
           </label>
 
           <div class="cart-summary">
+            <div class="cart-summary-breakdown">
+              <div class="cart-summary-row">
+                <span>Tạm tính</span>
+                <strong id="cart-subtotal">0đ</strong>
+              </div>
+              <div class="cart-summary-row">
+                <span>Phí vận chuyển</span>
+                <strong id="cart-shipping">0đ</strong>
+              </div>
+              <p class="cart-shipping-note" id="cart-shipping-note">Miễn phí vận chuyển cho đơn từ 500.000đ.</p>
+            </div>
             <p id="cart-summary-note">Chọn sản phẩm bạn muốn thanh toán hoặc xóa khỏi giỏ.</p>
             <div class="total-price">
               Tổng: <span id="cart-total">0đ</span>
@@ -65,9 +76,10 @@
     </section>
   </main>
 
-  <script defer src="giohang.js?v=20260325-1"></script>
+  <script defer src="giohang.js?v=20260329-2"></script>
 
   <footer class="site-footer" id="site-footer"></footer>
 </body>
 
 </html>
+

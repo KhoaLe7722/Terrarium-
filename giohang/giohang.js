@@ -1,8 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const SHIPPING_FEE = 50000;
+  const FREE_SHIPPING_THRESHOLD = 500000;
   const cartSurface = document.getElementById("cart-popup")
     || document.querySelector(".cart-card")
     || document.querySelector(".cart-page-shell");
   const cartItemsEl = document.getElementById("cart-items");
+  const cartSubtotalEl = document.getElementById("cart-subtotal");
+  const cartShippingEl = document.getElementById("cart-shipping");
+  const cartShippingNoteEl = document.getElementById("cart-shipping-note");
   const cartTotalEl = document.getElementById("cart-total");
   const cartSummaryNoteEl = document.getElementById("cart-summary-note");
   const cartToggle = document.getElementById("cart-toggle");
@@ -375,6 +380,28 @@ document.addEventListener("DOMContentLoaded", () => {
     return Number(value).toLocaleString("vi-VN") + "đ";
   }
 
+  function calculateShipping(subtotal) {
+    const normalizedSubtotal = Math.max(0, Number(subtotal) || 0);
+
+    if (normalizedSubtotal <= 0) {
+      return 0;
+    }
+
+    return normalizedSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  }
+
+  function buildPricingSummary(subtotal) {
+    const normalizedSubtotal = Math.max(0, Number(subtotal) || 0);
+    const shipping = calculateShipping(normalizedSubtotal);
+
+    return {
+      subtotal: normalizedSubtotal,
+      shipping,
+      total: normalizedSubtotal + shipping,
+      isFreeShipping: normalizedSubtotal > 0 && shipping === 0,
+    };
+  }
+
   function resolveImage(item) {
     return item && item.image ? `../${item.image}` : fallbackImage;
   }
@@ -420,12 +447,34 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateCartSummary(cart, selectedIds) {
     const selectedIdSet = new Set(selectedIds);
     const selectedItems = cart.filter((item) => selectedIdSet.has(Number(item.id)));
-    const total = selectedItems.reduce((sum, item) => {
+    const subtotal = selectedItems.reduce((sum, item) => {
       return sum + Number(item.price) * Number(item.quantity);
     }, 0);
+    const pricing = buildPricingSummary(subtotal);
+
+    if (cartSubtotalEl) {
+      cartSubtotalEl.textContent = formatPrice(pricing.subtotal);
+    }
+
+    if (cartShippingEl) {
+      cartShippingEl.textContent = pricing.isFreeShipping
+        ? "Miễn phí"
+        : formatPrice(pricing.shipping);
+    }
+
+    if (cartShippingNoteEl) {
+      if (!selectedItems.length) {
+        cartShippingNoteEl.textContent = "Phí vận chuyển tiêu chuẩn là 50.000đ cho đơn dưới 500.000đ.";
+      } else if (pricing.isFreeShipping) {
+        cartShippingNoteEl.textContent = "Đơn đã đạt mốc miễn phí vận chuyển.";
+      } else {
+        const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - pricing.subtotal);
+        cartShippingNoteEl.textContent = `Mua thêm ${formatPrice(remaining)} để được miễn phí vận chuyển.`;
+      }
+    }
 
     if (cartTotalEl) {
-      cartTotalEl.textContent = formatPrice(total);
+      cartTotalEl.textContent = formatPrice(pricing.total);
     }
 
     if (cartSummaryNoteEl) {

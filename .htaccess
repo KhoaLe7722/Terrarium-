@@ -1,0 +1,9 @@
+AddDefaultCharset UTF-8
+
+<IfModule mod_mime.c>
+  AddCharset UTF-8 .css .js .json .txt .html .htm .xml
+</IfModule>
+
+<IfModule mod_php.c>
+  php_value default_charset UTF-8
+</IfModule>

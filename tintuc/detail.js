@@ -41,26 +41,6 @@ const tintuc = [
         },
     },
     {
-        id: 5,
-        tieude: "Cây cảnh và phong thủy – Bí quyết làm giàu từ cây kiểng",
-        image: "img__tintuc/5.jpg",
-        url: "detail.php?id=5",
-        noidung: {
-            content1: "Cây cảnh không chỉ để trang trí mà còn mang ý nghĩa phong thủy sâu sắc. Cây mai vàng, cây cảnh Tết có thể mang lại may mắn, tài lộc và sức khỏe cho gia đình. Đây là lý do vì sao chúng trở thành món quà quý giá trong dịp Tết.",
-
-            content__box: [
-                {
-                    content: "Cây cảnh không chỉ có giá trị thẩm mỹ mà còn mang trong mình những ý nghĩa sâu sắc về phong thủy. Trong văn hóa phương Đông, cây kiểng được cho là có khả năng mang lại tài lộc, may mắn và thịnh vượng cho gia chủ. Mỗi loại cây cảnh đều có một ý nghĩa riêng biệt và được chọn lựa cẩn thận để phù hợp với không gian sống cũng như vận mệnh của người sở hữu. Ví dụ, cây phát lộc, cây tiền tài hay cây phú quý được tin là có thể mang lại sự giàu có, thịnh vượng và xua đuổi những năng lượng tiêu cực. Chính vì vậy, việc lựa chọn cây cảnh phù hợp không chỉ giúp không gian trở nên tươi mới mà còn giúp cải thiện phong thủy, thu hút tài lộc và may mắn cho gia đình. Cây cảnh, khi được chăm sóc đúng cách, không chỉ tạo nên vẻ đẹp mà còn là công cụ trong việc cải thiện và duy trì sự cân bằng, hài hòa trong cuộc sống.",
-                    img: "img__tintuc/2.jpg"
-                },
-                {
-                    content: "Nghề trồng cây kiểng, đặc biệt là cây phong thủy, đã và đang trở thành một cơ hội kinh doanh tiềm năng cho nhiều người. Việc kết hợp giữa nghệ thuật trồng cây kiểng và kiến thức phong thủy đã tạo ra một xu hướng mới, giúp người trồng không chỉ tạo ra những sản phẩm đẹp mà còn có thể làm giàu từ những giá trị tinh thần mà cây cảnh mang lại. Cây cảnh phong thủy không chỉ là sản phẩm trang trí mà còn là một món quà mang ý nghĩa sâu sắc, giúp người mua giải quyết các vấn đề về tài lộc, sức khỏe và gia đạo. Những người làm nghề trồng cây kiểng biết cách nghiên cứu và áp dụng nguyên lý phong thủy trong việc chăm sóc và tạo hình cây, từ đó cung cấp sản phẩm đáp ứng nhu cầu thị trường. Việc mở rộng thị trường cây cảnh phong thủy, cả trong nước và quốc tế, mang đến cơ hội làm giàu bền vững từ nghề trồng cây kiểng, giúp tạo dựng sự nghiệp lâu dài từ một công việc tưởng chừng như đơn giản nhưng lại ẩn chứa nhiều giá trị vô giá.",
-                    img: "img__tintuc/3 .jpg"
-                },
-            ],
-        },
-    },
-    {
         id: 6,
         tieude: "Trồng cây cảnh trong nhà – Mẹo chăm sóc cây kiểng",
         image: "img__tintuc/6.jpg",
@@ -412,276 +392,396 @@ Cây lưỡi hổ là một trong những loại cây kiểng phổ biến vì t
 
 
 ]
+const currentArticleId = Number(articleId);
 const like = document.getElementById("like");
-like.addEventListener("click", function () {
-    if (like.classList.contains("like__class")) {
-        like.classList.remove("like__class");
-        like.classList.add("not__like__class");
-        localStorage.setItem(`yeuthich${articleId - 1}`, 1);
+const relatedBox = document.getElementById("tintuclienquan__container");
+const pageTitle = document.getElementById("title");
+const breadcrumbTitle = document.getElementById("breadcrumb-title");
+const heroImage = document.getElementById("img");
+const leadContent = document.getElementById("content");
+const articleSections = document.getElementById("article-sections");
+const shareMail = document.getElementById("share-mail");
+
+function sanitizeImagePath(path) {
+    return String(path || "../images/avatar.png")
+        .trim()
+        .replace(/\s+\.(jpg|jpeg|png|webp|gif)$/i, ".$1");
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function stripHtml(value) {
+    return String(value ?? "")
+        .replace(/<br\s*\/?>/gi, " ")
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function truncateText(value, maxLength = 120) {
+    const plain = stripHtml(value);
+    if (plain.length <= maxLength) {
+        return plain;
     }
-    else {
-        like.classList.remove("not__like__class");
-        like.classList.add("like__class");
-        localStorage.setItem(`yeuthich${articleId - 1}`, 0);
+    return `${plain.slice(0, maxLength).trim()}...`;
+}
+
+function formatRichText(value) {
+    const raw = String(value ?? "").trim();
+    if (raw === "") {
+        return "";
     }
-});
-function displayLike() {
-    if (localStorage.getItem(`yeuthich${articleId - 1}`) === "0") {
-        like.classList.add("like__class");
+
+    if (/<(br|p|ul|ol|li|strong|em|h\d)/i.test(raw)) {
+        return raw;
     }
-    else if (localStorage.getItem(`yeuthich${articleId - 1}`) === "1") {
-        like.classList.add("not__like__class");
+
+    return `<p>${raw.replace(/\n{2,}/g, "</p><p>").replace(/\n/g, "<br>")}</p>`;
+}
+
+function getCurrentArticle(id) {
+    return tintuc.find((item) => item.id === Number(id));
+}
+
+function updateLikeState() {
+    if (!like) {
+        return;
     }
-    else {
-        localStorage.setItem(`yeuthich${articleId - 1}`, 1);
-        like.classList.add("not__like__class");
+
+    const state = localStorage.getItem(`yeuthich${currentArticleId}`);
+    const liked = state === "0";
+    like.classList.toggle("like__class", liked);
+    like.classList.toggle("not__like__class", !liked);
+
+    const label = like.querySelector("span");
+    if (label) {
+        label.textContent = liked ? "Đã thích" : "Yêu thích";
     }
-};
-displayLike();
+}
+
+if (like) {
+    if (localStorage.getItem(`yeuthich${currentArticleId}`) === null) {
+        localStorage.setItem(`yeuthich${currentArticleId}`, "1");
+    }
+
+    updateLikeState();
+    like.addEventListener("click", function () {
+        const isLiked = like.classList.contains("like__class");
+        localStorage.setItem(`yeuthich${currentArticleId}`, isLiked ? "1" : "0");
+        updateLikeState();
+    });
+}
+
 function loadPage(id) {
-    const detail = tintuc.find(a => a.id === parseInt(id));
+    const detail = getCurrentArticle(id);
     if (!detail) {
         window.location.replace("tintuc.php");
         return;
     }
 
-    document.getElementById('title').textContent = detail.tieude;
-    document.getElementById('img').src = detail.image;
-    document.getElementById('content').innerHTML = detail.noidung.content1;
+    pageTitle.textContent = detail.tieude;
+    breadcrumbTitle.textContent = detail.tieude;
+    document.title = `${detail.tieude} | Thuận Phát Garden`;
 
-    const n = detail.noidung.content__box.length;
-    for (let i = 0; i < n; i++) {
-        const image = document.createElement("img");
-        image.src = detail.noidung.content__box[i].img;
-        image.id = `img${i}`;
-        image.alt = "Hinh anh"
-        image.classList.add("imgs");
-        const content = document.createElement("p");
-
-        content.innerHTML = detail.noidung.content__box[i].content;
-        content.id = `content${i}`;
-        content.classList.add("contents");
-        document.getElementById("thechua").appendChild(image);
-        document.getElementById("thechua").appendChild(content);
-    }
-}
-loadPage(articleId);
-//tin tuc lien quan
-const lq__box = document.getElementById("tintuclienquan__container");
-function displaylq() {
-    lq__box.innerHTML = "";
-    // console.log(tintuc);
-    for (let j = 1; j <= 10; j++) {
-        let item = tintuc[Math.floor(Math.random() * tintuc.length)];
-
-        const card = document.createElement("a");
-        const img = document.createElement("img");
-        const title = document.createElement("p");
-        card.classList.add("lienquan__card");
-        title.classList.add("lienquan__title");
-        img.classList.add("lienquan__img");
-
-        card.href = item.url;
-        img.src = item.image;
-        title.textContent = item.tieude;
-
-        // card.appendChild()
-        card.appendChild(img);
-        card.appendChild(title);
-        lq__box.appendChild(card);
-    }
-}
-displaylq();
-//input 
-function getFormForm() {
-    var user = document.querySelector("#name");
-    var comment__content = document.querySelector("#comment__content");
-    var parent = user.parentElement;
-
-    function showError(input) {
-        var parent = input.parentElement;
-        var noti = parent.querySelector("span");
-        noti.classList.add("control-noti--error");
-        noti.innerHTML = "Không để trống";
-    }
-    function showSucces(input) {
-        var parent = input.parentElement;
-        var noti = parent.querySelector("span");
-        noti.classList.remove("control-noti--error");
-        noti.innerHTML = "";
-    }
-    // showError(comment__content);
-    function checkLength(input) {
-        input.value = input.value.trim();
-        if (input.value.length === 0) {
-            showError(input);
-            return true;
-        }
-        return false;
-    }
-    document.querySelector("#comment__form").addEventListener("submit", function (e) {
-        e.preventDefault();
-        showSucces(user);
-        showSucces(comment__content);
-        var checkLengthUser = checkLength(user);
-        var checkLengthComment = checkLength(comment__content);
-        if (!checkLengthComment && !checkLengthUser) {
-            getComment();
-            this.reset();
-        }
-    })
-}
-getFormForm();
-document.querySelector("#btn__themmoi").addEventListener("click", function () {
-    const form = document.querySelector("#comment__form");
-    if (form.classList.contains("class__open__form")) {
-        form.classList.remove("class__open__form");
-    }
-    else
-        form.classList.add("class__open__form");
-
-});
-document.querySelector("#form-submit").addEventListener("click", function () {
-    const form = document.querySelector("#comment__form");
-    if (form.classList.contains("class__open__form")) {
-        form.classList.remove("class__open__form");
-    }
-    else
-        form.classList.add("class__open__form");
-});
-document.addEventListener("keydown", function (e) {
-    if (e.ctrlKey && e.key === "Enter") {
-        getFormForm();
-    }
-})
-
-
-
-
-//binh luan beta    
-const page = JSON.parse(localStorage.getItem(`comment${articleId}`)); //lay ra ojbect co luu 
-const trash = JSON.parse(localStorage.getItem(`array${articleId}`));
-
-// resetComment(page);     
-function resetComment(page) {
-    for (let i = 1; i <= tintuc.length; i++) {
-        let n = 0;
-        let trash = [];
-        const comment = {
-            id: i,
-            sl: n,
-            soluong: n,
-            comments: [
-                {
-                    user: "",
-                    write: "",
-                    code: `${i}${n}`,
-                    status_like: 0,
-                    // avt: `fa-user`,
-                }
-            ]
-        }
-           localStorage.setItem(`array${i}`, JSON.stringify(trash));
-        localStorage.setItem(`comment${i}`, JSON.stringify(comment));
-    }
-    loadComments(page, trash);
-}
-function getComment(e) {
-    const comment = document.getElementById("comment__content").value;
-    const nguoidung = document.getElementById("name").value;
-  
-    page.sl++;
-    page.soluong++;
-    page.comments[page.sl] = {
-        user: nguoidung,
-        write: comment,
-        code: `${articleId}${page.sl}`,
-        status_like: 0,
-        avt: e,
-
+    heroImage.src = sanitizeImagePath(detail.image);
+    heroImage.alt = detail.tieude;
+    heroImage.onerror = function () {
+        this.onerror = null;
+        this.src = "../images/avatar.png";
     };
-    
-    localStorage.setItem(`comment${articleId}`,JSON.stringify(page));
-    loadComments(page, trash);
-    
-};
 
-function DisplaylikeComment(i){
-    // event.preventDefault();
-    if(page.comments[i].status_like==1){
-        page.comments[i].status_like = 0;
-        notification("Đã bỏ thích bình luận")
-    }
-    else
-    {
-        notification("Đã thích bình luận")
-        page.comments[i].status_like=1;
-    }
+    leadContent.innerHTML = formatRichText(detail.noidung.content1);
 
-    localStorage.setItem(`comment${articleId}`,JSON.stringify(page));
-    loadComments(page,trash)
+    articleSections.innerHTML = "";
+    (detail.noidung.content__box || []).forEach((item, index) => {
+        const section = document.createElement("section");
+        section.className = `news-section${index % 2 === 1 ? " news-section--reverse" : ""}`;
+
+        const textHtml = formatRichText(item.content);
+        const imagePath = sanitizeImagePath(item.img);
+        const hasText = stripHtml(item.content) !== "";
+        const hasImage = imagePath !== "";
+
+        section.innerHTML = `
+            ${hasText ? `<div class="news-section__content">${textHtml}</div>` : ""}
+            ${hasImage ? `
+                <div class="news-section__media">
+                    <img class="news-section__image" src="${imagePath}" alt="${escapeHtml(detail.tieude)}" loading="lazy">
+                </div>
+            ` : ""}
+        `;
+
+        const sectionImage = section.querySelector(".news-section__image");
+        if (sectionImage) {
+            sectionImage.onerror = function () {
+                this.onerror = null;
+                this.src = "../images/avatar.png";
+            };
+        }
+
+        articleSections.appendChild(section);
+    });
+
+    if (shareMail) {
+        shareMail.href = `mailto:?subject=${encodeURIComponent(detail.tieude)}&body=${encodeURIComponent(window.location.href)}`;
+    }
 }
+
+function displayRelatedNews() {
+    if (!relatedBox) {
+        return;
+    }
+
+    const currentId = Number(articleId);
+    const relatedItems = tintuc
+        .filter((item) => item.id !== currentId)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 4);
+
+    relatedBox.innerHTML = "";
+
+    relatedItems.forEach((item) => {
+        const card = document.createElement("a");
+        card.className = "news-related-item";
+        card.href = item.url;
+        card.innerHTML = `
+            <div class="news-related-item__image">
+                <img src="${sanitizeImagePath(item.image)}" alt="${escapeHtml(item.tieude)}" loading="lazy">
+            </div>
+            <div class="news-related-item__content">
+                <span>Tin tức</span>
+                <h3>${escapeHtml(item.tieude)}</h3>
+                <p>${escapeHtml(truncateText(item.noidung?.content1 || "", 88))}</p>
+            </div>
+        `;
+
+        const image = card.querySelector("img");
+        if (image) {
+            image.onerror = function () {
+                this.onerror = null;
+                this.src = "../images/avatar.png";
+            };
+        }
+
+        relatedBox.appendChild(card);
+    });
+}
+
+function createEmptyCommentState(id) {
+    return {
+        id: Number(id),
+        sl: 0,
+        soluong: 0,
+        comments: [null],
+    };
+}
+
+function ensureCommentStorage() {
+    const pageKey = `comment${currentArticleId}`;
+    const trashKey = `array${currentArticleId}`;
+
+    let storedPage;
+    let storedTrash;
+
+    try {
+        storedPage = JSON.parse(localStorage.getItem(pageKey));
+    } catch (error) {
+        storedPage = null;
+    }
+
+    if (!storedPage || typeof storedPage !== "object" || !Array.isArray(storedPage.comments)) {
+        storedPage = createEmptyCommentState(currentArticleId);
+        localStorage.setItem(pageKey, JSON.stringify(storedPage));
+    }
+
+    try {
+        storedTrash = JSON.parse(localStorage.getItem(trashKey));
+    } catch (error) {
+        storedTrash = null;
+    }
+
+    if (!Array.isArray(storedTrash)) {
+        storedTrash = [];
+        localStorage.setItem(trashKey, JSON.stringify(storedTrash));
+    }
+
+    return { storedPage, storedTrash };
+}
+
+let { storedPage: page, storedTrash: trash } = ensureCommentStorage();
+
+function persistComments() {
+    localStorage.setItem(`comment${currentArticleId}`, JSON.stringify(page));
+    localStorage.setItem(`array${currentArticleId}`, JSON.stringify(trash));
+}
+
 function notification(message) {
-        const elements = document.getElementById("notification");
-    elements.textContent = message;
-    elements.classList.add("notification_active");
-    setTimeout(function () {
-        elements.classList.remove("notification_active");
-    },800);
-    
-}
-function loadComments(page, trash) {
-    const comment__box = document.getElementById("comment__box__id");
-    if (page.soluong < 1) {
-        comment__box.innerHTML = "Chưa tồn tại bình luận!"
-
+    const element = document.getElementById("notification");
+    if (!element) {
+        return;
     }
-    else {
-        comment__box.innerHTML = "";
-        for (let i = 1; i <= page.sl; i++) {
-            const box = document.createElement("div");
-            box.classList.add("comment__bl");
-            box.innerHTML = `
-            
-            
-            <div class="name__user__box"><i class="fa-solid fa-user"></i> User name: ${page.comments[i].user}</div>
-            <div class="comment__user">Nội Dung: ${page.comments[i].write}</div>
-            <i class="fa-trash icon--trash fa-solid" id = "${page.comments[i].code}" onclick="deleteComment(id)"></i>
-            
-            <i class="fa-solid fa-thumbs-up" style="margin-left: 8px" id="like${page.comments[i].code}" onclick="DisplaylikeComment(${i})"></i>
 
-            `;
-          
-  
-                if (!trash.includes(`${page.comments[i].code}`)) {
+    element.textContent = message;
+    element.classList.add("notification_active");
+    setTimeout(function () {
+        element.classList.remove("notification_active");
+    }, 1200);
+}
 
-                    comment__box.prepend(box);
-            
-            let element = document.querySelector(`#like${page.comments[i].code}`)
-            if(page.comments[i].status_like==1  )
-             {
-                   element.classList.add("like_cmt");
+function loadComments(currentPage, currentTrash) {
+    const commentBox = document.getElementById("comment__box__id");
+    if (!commentBox) {
+        return;
+    }
 
-
-             }
-            else{
-                element.classList.remove("like_cmt");
-
-            }
-      
-                }
+    const visibleComments = [];
+    for (let i = 1; i <= currentPage.sl; i++) {
+        const item = currentPage.comments[i];
+        if (item && !currentTrash.includes(String(item.code))) {
+            visibleComments.push({ item, index: i });
         }
     }
+
+    if (visibleComments.length === 0) {
+        commentBox.innerHTML = `<div class="comment--empty">Chưa có bình luận nào cho bài viết này.</div>`;
+        return;
+    }
+
+    commentBox.innerHTML = "";
+    visibleComments.reverse().forEach(({ item, index }) => {
+        const box = document.createElement("div");
+        box.className = "comment__bl";
+        box.innerHTML = `
+            <div class="name__user__box"><i class="fa-solid fa-user"></i> ${escapeHtml(item.user)}</div>
+            <div class="comment__user">${escapeHtml(item.write)}</div>
+            <i class="fa-solid fa-thumbs-up comment__like ${item.status_like === 1 ? "like_cmt" : ""}" onclick="DisplaylikeComment(${index})"></i>
+            <i class="fa-solid fa-trash icon--trash" onclick="deleteComment('${item.code}')"></i>
+        `;
+        commentBox.appendChild(box);
+    });
 }
 
-    function deleteComment(e) {
-        trash.push(e);
-        page.soluong--;
-        localStorage.setItem(`array${articleId}`, JSON.stringify(trash));
+function getComment() {
+    const commentInput = document.getElementById("comment__content");
+    const userInput = document.getElementById("name");
+
+    const comment = commentInput.value.trim();
+    const username = userInput.value.trim();
+
+    page.sl += 1;
+    page.soluong += 1;
+    page.comments[page.sl] = {
+        user: username,
+        write: comment,
+        code: `${currentArticleId}${page.sl}`,
+        status_like: 0,
+    };
+
+    persistComments();
+    loadComments(page, trash);
+    notification("Đã thêm bình luận");
+}
+
+function showError(input) {
+    const parent = input.parentElement;
+    const noti = parent.querySelector("span");
+    input.classList.add("error");
+    noti.classList.add("control-noti--error");
+    noti.textContent = "Không để trống";
+}
+
+function showSuccess(input) {
+    const parent = input.parentElement;
+    const noti = parent.querySelector("span");
+    input.classList.remove("error");
+    noti.classList.remove("control-noti--error");
+    noti.textContent = "";
+}
+
+function hasEmptyValue(input) {
+    input.value = input.value.trim();
+    if (input.value.length === 0) {
+        showError(input);
+        return true;
+    }
+    return false;
+}
+
+function setupCommentForm() {
+    const form = document.querySelector("#comment__form");
+    const user = document.querySelector("#name");
+    const commentInput = document.querySelector("#comment__content");
+    const toggleButton = document.querySelector("#btn__themmoi");
+
+    if (!form || !user || !commentInput || !toggleButton) {
+        return;
+    }
+
+    toggleButton.addEventListener("click", function () {
+        form.classList.toggle("class__open__form");
+    });
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        showSuccess(user);
+        showSuccess(commentInput);
+
+        const invalidUser = hasEmptyValue(user);
+        const invalidComment = hasEmptyValue(commentInput);
+
+        if (!invalidUser && !invalidComment) {
+            getComment();
+            form.reset();
+            form.classList.remove("class__open__form");
+        }
+    });
+
+    commentInput.addEventListener("keydown", function (e) {
+        if (e.ctrlKey && e.key === "Enter") {
+            form.requestSubmit();
+        }
+    });
+}
+
+function DisplaylikeComment(index) {
+    if (!page.comments[index]) {
+        return;
+    }
+
+    if (page.comments[index].status_like === 1) {
+        page.comments[index].status_like = 0;
+        notification("Đã bỏ thích bình luận");
+    } else {
+        page.comments[index].status_like = 1;
+        notification("Đã thích bình luận");
+    }
+
+    persistComments();
+    loadComments(page, trash);
+}
+
+function deleteComment(code) {
+    if (!trash.includes(String(code))) {
+        trash.push(String(code));
+        page.soluong = Math.max(0, page.soluong - 1);
+        persistComments();
         notification("Đã xóa bình luận");
         loadComments(page, trash);
     }
-    loadComments(page, trash);
+}
+
+loadPage(currentArticleId);
+displayRelatedNews();
+setupCommentForm();
+loadComments(page, trash);
     // const box_icon = document.querySelector("#daidien_space");
     // box_icon.innerHTML =
     // `   

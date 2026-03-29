@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'config.php';
 require_once __DIR__ . '/../includes/store_helpers.php';
@@ -201,7 +201,7 @@ $orders = $stmt->fetchAll();
     <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
+<link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
     <link rel="stylesheet" href="ho_so.css?v=20260324-3" />
     <style>
         .profile-info {
@@ -285,8 +285,8 @@ $orders = $stmt->fetchAll();
 
 <body data-page="profile">
     <nav class="navigation" id="main-nav"></nav>
-    <script defer src="../mainfont/layout.js?v=20260324-9"></script>
-    <script defer src="../mainfont/main.js?v=20260324-6"></script>
+<script defer src="../mainfont/layout.js?v=20260329-4"></script>
+    <script defer src="../mainfont/main.js?v=20260329-2"></script>
 
     <main class="body__main" style="margin-top: 30px; min-height: 60vh;">
         <div class="profile-container">
@@ -475,11 +475,24 @@ $orders = $stmt->fetchAll();
 
     <footer class="site-footer" id="site-footer"></footer>
 
-<script src="../giohang/giohang.js?v=20260325-1"></script>
+<script src="../giohang/giohang.js?v=20260329-2"></script>
     <script defer src="order_actions.js?v=20260324-1"></script>
     <script>
+        const PROFILE_SHIPPING_FEE = 50000;
+        const PROFILE_FREE_SHIPPING_THRESHOLD = 500000;
+
         function formatPrice(value) {
             return Number(value).toLocaleString('vi-VN') + 'đ';
+        }
+
+        function calculateProfileShipping(subtotal) {
+            const normalizedSubtotal = Math.max(0, Number(subtotal) || 0);
+
+            if (normalizedSubtotal <= 0) {
+                return 0;
+            }
+
+            return normalizedSubtotal >= PROFILE_FREE_SHIPPING_THRESHOLD ? 0 : PROFILE_SHIPPING_FEE;
         }
 
         function resolveCartImage(item) {
@@ -523,9 +536,16 @@ $orders = $stmt->fetchAll();
                 `;
             });
 
+            const shipping = calculateProfileShipping(total);
+            const grandTotal = total + shipping;
+
             html += `
-                <div class="order-footer" style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
-                    <span>Tạm tính: ${formatPrice(total)}</span>
+                <div class="order-footer" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+                    <div style="display:grid;gap:6px;">
+                        <span>Tạm tính: ${formatPrice(total)}</span>
+                        <span>Phí vận chuyển: ${shipping === 0 ? 'Miễn phí' : formatPrice(shipping)}</span>
+                        <strong>Tổng thanh toán: ${formatPrice(grandTotal)}</strong>
+                    </div>
                     <div class="profile-actions" style="margin-top:0;">
                         <a class="profile-action secondary" href="../giohang/giohang.php">Xem giỏ hàng</a>
                         <a class="profile-action" href="../thanhtoan/thanhtoan.php">Thanh toán</a>
@@ -564,6 +584,7 @@ $orders = $stmt->fetchAll();
 </body>
 
 </html>
+
 
 
 

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once '../dangky_dangnhap/config.php';
 require_once '../includes/store_helpers.php';
 
@@ -166,14 +166,14 @@ $featuredArticles = [
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
-  <link rel="stylesheet" href="./spchitiet.css?v=20260324-10" />
+  <link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
+  <link rel="stylesheet" href="./spchitiet.css?v=20260329-11" />
 </head>
 
 <body data-page="products">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js?v=20260324-9"></script>
-  <script defer src="../mainfont/main.js?v=20260324-6"></script>
+  <script defer src="../mainfont/layout.js?v=20260329-4"></script>
+  <script defer src="../mainfont/main.js?v=20260329-2"></script>
 
   <main class="detail-page">
     <section class="detail-hero">
@@ -338,6 +338,13 @@ $featuredArticles = [
                 <?php endforeach; ?>
               </div>
 
+              <figure class="detail-care-visual">
+                <img
+                  src="../images/huongdan1.jpg"
+                  alt="<?= htmlspecialchars(u('H\u01b0\u1edbng d\u1eabn ch\u0103m s\u00f3c terrarium')) ?>"
+                  onerror="this.onerror=null;this.src='../images/avatar.png';">
+              </figure>
+
               <div class="detail-care-note">
                 <h3><?= htmlspecialchars(u('G\u1ee3i \u00fd khi nh\u1eadn h\u00e0ng')) ?></h3>
                 <ul>
@@ -399,7 +406,7 @@ $featuredArticles = [
                 <ion-icon name="call-outline"></ion-icon>
                 <div>
                   <strong><?= htmlspecialchars(u('Hotline t\u01b0 v\u1ea5n')) ?></strong>
-                  <a href="tel:0945720038">0945 720 038</a>
+                  <a href="tel:0839778271">083 977 8271</a>
                 </div>
               </li>
               <li>
@@ -602,6 +609,7 @@ $featuredArticles = [
 </body>
 
 </html>
+
 
 
 

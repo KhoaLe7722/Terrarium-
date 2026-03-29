@@ -64,14 +64,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
-    <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
+<link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
     <link rel="stylesheet" href="dangky_dangnhap.css?v=20260324-1" />
 </head>
 
 <body data-page="login">
     <nav class="navigation" id="main-nav"></nav>
-    <script defer src="../mainfont/layout.js?v=20260324-9"></script>
-    <script defer src="../mainfont/main.js?v=20260324-6"></script>
+<script defer src="../mainfont/layout.js?v=20260329-4"></script>
+    <script defer src="../mainfont/main.js?v=20260329-2"></script>
 
     <main class="body__main body__main__login">
         <div class="auth-form">
@@ -132,11 +132,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
-
-
-
-
-
-
-
-

@@ -71,6 +71,43 @@ if (!function_exists('order_can_customer_cancel')) {
     }
 }
 
+if (!function_exists('store_shipping_fee')) {
+    function store_shipping_fee(): int
+    {
+        return 50000;
+    }
+}
+
+if (!function_exists('store_free_shipping_threshold')) {
+    function store_free_shipping_threshold(): int
+    {
+        return 500000;
+    }
+}
+
+if (!function_exists('store_calculate_shipping_fee')) {
+    function store_calculate_shipping_fee(float|int|string $subtotal): int
+    {
+        $normalizedSubtotal = max(0, (float) $subtotal);
+
+        if ($normalizedSubtotal <= 0) {
+            return 0;
+        }
+
+        return $normalizedSubtotal >= store_free_shipping_threshold()
+            ? 0
+            : store_shipping_fee();
+    }
+}
+
+if (!function_exists('store_calculate_order_total')) {
+    function store_calculate_order_total(float|int|string $subtotal): float
+    {
+        $normalizedSubtotal = max(0, (float) $subtotal);
+        return $normalizedSubtotal + store_calculate_shipping_fee($normalizedSubtotal);
+    }
+}
+
 if (!function_exists('change_order_status_with_inventory')) {
     function change_order_status_with_inventory(
         PDO $conn,

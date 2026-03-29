@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once '../dangky_dangnhap/config.php';
 require_once '../includes/store_helpers.php';
 
@@ -80,7 +80,7 @@ $homeNews = [
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
+<link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
   <link rel="stylesheet" href="index.css?v=20260316-11" />
   <style>
     .home-featured-wrap {
@@ -1145,8 +1145,8 @@ $homeNews = [
 
 <body data-page="home">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js?v=20260324-9"></script>
-  <script defer src="../mainfont/main.js?v=20260324-6"></script>
+<script defer src="../mainfont/layout.js?v=20260329-4"></script>
+  <script defer src="../mainfont/main.js?v=20260329-2"></script>
 
   <div class="slider">
     <div class="slides">
@@ -1614,6 +1614,7 @@ $homeNews = [
 </body>
 
 </html>
+
 
 
 

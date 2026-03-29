@@ -85,7 +85,7 @@ try {
 
     $orderItems = [];
     $stockIssues = [];
-    $tongTien = 0;
+    $tamTinh = 0;
 
     foreach ($normalizedCart as $productId => $quantity) {
         $product = $productMap[$productId] ?? null;
@@ -102,7 +102,7 @@ try {
         }
 
         $subTotal = (float) $product['gia'] * $quantity;
-        $tongTien += $subTotal;
+        $tamTinh += $subTotal;
 
         $orderItems[] = [
             'product_id' => $productId,
@@ -123,6 +123,9 @@ try {
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
+
+    $phiVanChuyen = store_calculate_shipping_fee($tamTinh);
+    $tongTien = store_calculate_order_total($tamTinh);
 
     $orderStmt = $conn->prepare("
         INSERT INTO orders (user_id, ho_ten_kh, email_kh, sdt_kh, dia_chi_giao, ghi_chu, tong_tien, phuong_thuc_tt, trang_thai)
@@ -177,6 +180,9 @@ try {
     echo json_encode([
         'success' => true,
         'order_id' => $orderId,
+        'order_code' => 'DH' . str_pad((string) $orderId, 8, '0', STR_PAD_LEFT),
+        'tam_tinh' => $tamTinh,
+        'phi_van_chuyen' => $phiVanChuyen,
         'tong_tien' => $tongTien,
     ]);
 } catch (Throwable $e) {

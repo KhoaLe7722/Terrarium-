@@ -1,13 +1,60 @@
-﻿<?php
+<?php
 require_once '../dangky_dangnhap/config.php';
 require_once '../includes/store_helpers.php';
 
-$stmt = $conn->query("
-    SELECT id, ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh, so_luong_ton
+function format_product_currency(float|int|string $amount): string
+{
+    return number_format((float) $amount, 0, ',', '.') . 'đ';
+}
+
+function build_product_page_url(string $searchTerm, ?string $sortValue = null): string
+{
+    $query = [];
+
+    if ($searchTerm !== '') {
+        $query['q'] = $searchTerm;
+    }
+
+    if ($sortValue !== null && $sortValue !== '' && $sortValue !== 'default') {
+        $query['sort'] = $sortValue;
+    }
+
+    return 'sanpham.php' . ($query !== [] ? '?' . http_build_query($query) : '');
+}
+
+$searchTerm = trim((string) ($_GET['q'] ?? ''));
+$sortBy = trim((string) ($_GET['sort'] ?? 'default'));
+$allowedSorts = ['default', 'price_asc', 'price_desc'];
+if (!in_array($sortBy, $allowedSorts, true)) {
+    $sortBy = 'default';
+}
+
+$sql = "
+    SELECT id, ten_sp, gia, gia_goc, giam_gia_phan_tram, hinh_chinh, mo_ta, so_luong_ton
     FROM products
-    ORDER BY (so_luong_ton > 0) DESC, id ASC
-");
-$products = $stmt->fetchAll();
+";
+$params = [];
+
+if ($searchTerm !== '') {
+    $sql .= "
+        WHERE ten_sp LIKE :search
+           OR mo_ta LIKE :search
+    ";
+    $params['search'] = '%' . $searchTerm . '%';
+}
+
+$orderBy = match ($sortBy) {
+    'price_asc' => '(so_luong_ton > 0) DESC, gia ASC, id ASC',
+    'price_desc' => '(so_luong_ton > 0) DESC, gia DESC, id DESC',
+    default => '(so_luong_ton > 0) DESC, id ASC',
+};
+
+$sql .= " ORDER BY {$orderBy}";
+
+$stmt = $conn->prepare($sql);
+$stmt->execute($params);
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$productCount = count($products);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -18,22 +65,34 @@ $products = $stmt->fetchAll();
   <title>Tất cả sản phẩm | Thuận Phát Garden</title>
   <link rel="icon" href="../images/avatar.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="sanpham.css?v=20260324-1" />
-  <link rel="stylesheet" href="../mainfont/main.css?v=20260324-6" />
+  <link rel="stylesheet" href="sanpham.css?v=20260329-2" />
+<link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
 
 <body data-page="products">
   <nav class="navigation" id="main-nav"></nav>
-  <script defer src="../mainfont/layout.js?v=20260324-9"></script>
-  <script defer src="../mainfont/main.js?v=20260324-6"></script>
+<script defer src="../mainfont/layout.js?v=20260329-4"></script>
+  <script defer src="../mainfont/main.js?v=20260329-2"></script>
 
   <div class="page-header">
-    <h1>Tất cả sản phẩm</h1>
+    <h1><?= $searchTerm !== '' ? 'Kết quả tìm kiếm' : 'Tất cả sản phẩm' ?></h1>
     <div class="breadcrumb">
       <a href="../trangchu/index.php">Trang chủ</a> &gt;
       <span>Tất cả sản phẩm</span>
+    </div>
+    <div class="product-search-summary">
+      <?php if ($searchTerm !== ''): ?>
+        <div class="product-search-pill">
+          <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+          <span>Từ khóa: <strong><?= htmlspecialchars($searchTerm) ?></strong></span>
+        </div>
+        <span class="product-search-meta"><?= $productCount ?> sản phẩm phù hợp</span>
+        <a class="product-search-reset" href="sanpham.php">Xóa tìm kiếm</a>
+      <?php else: ?>
+        <span class="product-search-meta">Hiện có <?= $productCount ?> sản phẩm</span>
+      <?php endif; ?>
     </div>
   </div>
 
@@ -54,10 +113,36 @@ $products = $stmt->fetchAll();
       </aside>
 
       <section class="product-section">
+        <div class="product-toolbar">
+          <div class="product-toolbar__label">Sắp xếp theo giá</div>
+          <div class="product-sort-controls">
+            <a
+              class="product-sort-btn <?= $sortBy === 'default' ? 'is-active' : '' ?>"
+              href="<?= htmlspecialchars(build_product_page_url($searchTerm, 'default')) ?>">
+              Mặc định
+            </a>
+            <a
+              class="product-sort-btn <?= $sortBy === 'price_asc' ? 'is-active' : '' ?>"
+              href="<?= htmlspecialchars(build_product_page_url($searchTerm, 'price_asc')) ?>">
+              Giá thấp đến cao
+            </a>
+            <a
+              class="product-sort-btn <?= $sortBy === 'price_desc' ? 'is-active' : '' ?>"
+              href="<?= htmlspecialchars(build_product_page_url($searchTerm, 'price_desc')) ?>">
+              Giá cao đến thấp
+            </a>
+          </div>
+        </div>
+
         <div class="product-grid" id="product-grid">
           <?php if (empty($products)): ?>
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: #666;">
-              Chưa có sản phẩm nào.
+            <div class="product-empty-state">
+              <?php if ($searchTerm !== ''): ?>
+                <p>Không tìm thấy sản phẩm phù hợp với "<strong><?= htmlspecialchars($searchTerm) ?></strong>".</p>
+                <a href="sanpham.php">Xem tất cả sản phẩm</a>
+              <?php else: ?>
+                <p>Chưa có sản phẩm nào.</p>
+              <?php endif; ?>
             </div>
           <?php else: ?>
             <?php foreach ($products as $product): ?>
@@ -85,9 +170,9 @@ $products = $stmt->fetchAll();
                 <div class="product-content">
                   <div class="product-title"><?= htmlspecialchars($product['ten_sp']) ?></div>
                   <div class="product-price">
-                    <span class="current-price"><?= htmlspecialchars(format_currency_vnd($pricing['price'])) ?></span>
+                    <span class="current-price"><?= htmlspecialchars(format_product_currency($pricing['price'])) ?></span>
                     <?php if ($pricing['is_sale']): ?>
-                      <span class="old-price"><?= htmlspecialchars(format_currency_vnd($pricing['original_price'])) ?></span>
+                      <span class="old-price"><?= htmlspecialchars(format_product_currency($pricing['original_price'])) ?></span>
                     <?php endif; ?>
                   </div>
                   <div class="product-stock-note <?= $isInStock ? '' : 'is-out' ?>">
@@ -131,11 +216,3 @@ $products = $stmt->fetchAll();
 </body>
 
 </html>
-
-
-
-
-
-
-
-

@@ -29,6 +29,7 @@ var STORE_PATHS = {
   news: buildAppHref('tintuc/tintuc.php'),
   guide: buildAppHref('huongdan/huongdan.php'),
   cart: buildAppHref('giohang/giohang.php'),
+  searchApi: buildAppUrl('api/search_products.php'),
   login: buildAppHref('dangky_dangnhap/dangnhap.php'),
   register: buildAppHref('dangky_dangnhap/dangky.php'),
   profile: buildAppHref('dangky_dangnhap/ho_so.php'),
@@ -115,6 +116,30 @@ function buildCartBadgeMarkup() {
   return '<span class="cart-count-badge' + visibleClass + '" id="cart-count-badge" aria-live="polite" aria-atomic="true" aria-label="' + label + '"' + hiddenAttr + '>' + badgeText + '</span>';
 }
 
+function getSearchQuery() {
+  try {
+    return new URL(window.location.href).searchParams.get('q') || '';
+  } catch (error) {
+    return '';
+  }
+}
+
+function buildSearchForm() {
+  var currentQuery = escapeHtml(getSearchQuery().trim());
+
+  return '' +
+    '<form class="header-search-form" id="header-search-form" action="' + STORE_PATHS.products + '" method="get" role="search">' +
+    '<label class="sr-only" for="header-search-input">Tìm kiếm sản phẩm</label>' +
+    '<span class="header-search-leading-icon" aria-hidden="true"><ion-icon name="search-outline"></ion-icon></span>' +
+    '<input type="search" id="header-search-input" class="header-search-input" name="q" value="' + currentQuery + '" placeholder="Tìm terrarium, cây kiểng..." autocomplete="off" spellcheck="false" />' +
+    '<span class="header-search-loader" id="header-search-loader" hidden aria-hidden="true"></span>' +
+    '<button type="submit" class="header-search-submit" aria-label="Tìm kiếm sản phẩm">' +
+    '<ion-icon name="arrow-forward-outline"></ion-icon>' +
+    '</button>' +
+    '<div class="header-search-dropdown" id="header-search-dropdown" hidden></div>' +
+    '</form>';
+}
+
 var FOOTER_HTML = '' +
   '<div class="footer-container">' +
   '<div class="footer-column">' +
@@ -150,6 +175,137 @@ var FOOTER_HTML = '' +
   '<div class="footer-bottom">' +
   '&copy; Bản quyền thuộc về Thuận Phát Garden.' +
   '</div>';
+
+var SUPPORT_CONTACT = {
+  phoneText: '083 977 8271',
+  phoneHref: 'tel:0839778271',
+  emailText: 'thuanphatggarden@gmail.com',
+  emailHref: 'mailto:thuanphatggarden@gmail.com',
+  facebookHref: 'https://www.facebook.com/thuanphatggarden',
+  facebookText: 'Thu\u1eadn Ph\u00e1t Garden'
+};
+
+function buildSupportWidget() {
+  return '' +
+    '<div class="support-widget" id="support-widget">' +
+    '<button type="button" class="support-fab support-fab-desktop" data-support-toggle aria-expanded="false" aria-controls="support-panel" aria-label="M\u1edf h\u1ed9p t\u01b0 v\u1ea5n">' +
+    '<span class="support-fab-ring support-fab-ring-one" aria-hidden="true"></span>' +
+    '<span class="support-fab-ring support-fab-ring-two" aria-hidden="true"></span>' +
+    '<span class="support-fab-core">' +
+    '<ion-icon name="call-outline"></ion-icon>' +
+    '<span>T\u01b0 v\u1ea5n</span>' +
+    '</span>' +
+    '</button>' +
+    '<button type="button" class="support-fab support-fab-mobile" data-support-toggle aria-expanded="false" aria-controls="support-panel" aria-label="M\u1edf h\u1ed9p t\u01b0 v\u1ea5n">' +
+    '<ion-icon name="call-outline"></ion-icon>' +
+    '<span>T\u01b0 v\u1ea5n</span>' +
+    '</button>' +
+    '<aside class="support-panel" id="support-panel" aria-hidden="true">' +
+    '<button type="button" class="support-close" data-support-close aria-label="\u0110\u00f3ng t\u01b0 v\u1ea5n">' +
+    '<ion-icon name="close-outline"></ion-icon>' +
+    '</button>' +
+    '<div class="support-panel-head">' +
+    '<strong>H\u1ed7 tr\u1ee3 24/7</strong>' +
+    '<p>N\u1ebfu b\u1ea1n c\u1ea7n t\u01b0 v\u1ea5n ch\u1ecdn terrarium, c\u00e1ch ch\u0103m s\u00f3c ho\u1eb7c m\u1eabu qu\u00e0 t\u1eb7ng ph\u00f9 h\u1ee3p, h\u00e3y li\u00ean h\u1ec7 nhanh qua c\u00e1c k\u00eanh b\u00ean d\u01b0\u1edbi.</p>' +
+    '</div>' +
+    '<div class="support-panel-list">' +
+    '<a class="support-item" href="' + SUPPORT_CONTACT.phoneHref + '">' +
+    '<span class="support-item-icon"><ion-icon name="call-outline"></ion-icon></span>' +
+    '<span class="support-item-copy">' +
+    '<strong>G\u1ecdi ngay</strong>' +
+    '<span>' + SUPPORT_CONTACT.phoneText + '</span>' +
+    '</span>' +
+    '</a>' +
+    '<a class="support-item" href="' + SUPPORT_CONTACT.emailHref + '">' +
+    '<span class="support-item-icon"><ion-icon name="mail-outline"></ion-icon></span>' +
+    '<span class="support-item-copy">' +
+    '<strong>Email</strong>' +
+    '<span>' + SUPPORT_CONTACT.emailText + '</span>' +
+    '</span>' +
+    '</a>' +
+    '<a class="support-item" href="' + SUPPORT_CONTACT.facebookHref + '" target="_blank" rel="noreferrer">' +
+    '<span class="support-item-icon"><ion-icon name="logo-facebook"></ion-icon></span>' +
+    '<span class="support-item-copy">' +
+    '<strong>Nh\u1eafn Facebook</strong>' +
+    '<span>' + SUPPORT_CONTACT.facebookText + '</span>' +
+    '</span>' +
+    '</a>' +
+    '</div>' +
+    '</aside>' +
+    '</div>';
+}
+
+function initSupportWidget() {
+  if (window.supportWidgetCleanup) {
+    window.supportWidgetCleanup();
+    window.supportWidgetCleanup = null;
+  }
+
+  var widget = document.getElementById('support-widget');
+  if (!widget) return;
+
+  var panel = widget.querySelector('#support-panel');
+  var toggles = widget.querySelectorAll('[data-support-toggle]');
+  var closeButton = widget.querySelector('[data-support-close]');
+
+  function setSupportOpen(isOpen) {
+    widget.classList.toggle('is-open', !!isOpen);
+
+    if (panel) {
+      panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    }
+
+    for (var i = 0; i < toggles.length; i++) {
+      toggles[i].setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+  }
+
+  function handleDocumentClick(event) {
+    if (!widget.contains(event.target)) {
+      setSupportOpen(false);
+    }
+  }
+
+  function handleEscape(event) {
+    if (event.key === 'Escape') {
+      setSupportOpen(false);
+    }
+  }
+
+  for (var i = 0; i < toggles.length; i++) {
+    toggles[i].addEventListener('click', function (event) {
+      event.preventDefault();
+      setSupportOpen(!widget.classList.contains('is-open'));
+    });
+  }
+
+  if (closeButton) {
+    closeButton.addEventListener('click', function (event) {
+      event.preventDefault();
+      setSupportOpen(false);
+    });
+  }
+
+  document.addEventListener('click', handleDocumentClick);
+  document.addEventListener('keydown', handleEscape);
+
+  window.supportWidgetCleanup = function () {
+    document.removeEventListener('click', handleDocumentClick);
+    document.removeEventListener('keydown', handleEscape);
+  };
+}
+
+function renderSupportWidget() {
+  if (!document.body) return;
+
+  var existing = document.getElementById('support-widget');
+  if (existing) {
+    existing.remove();
+  }
+
+  document.body.insertAdjacentHTML('beforeend', buildSupportWidget());
+  initSupportWidget();
+}
 
 function buildAccountDropdown() {
   if (!sessionState.loggedIn) {
@@ -213,6 +369,13 @@ function buildNav(activeKey) {
     '</a>' +
     '</div>' +
     '<ul class="nav-right">' +
+    '<li class="header-search-item">' +
+    '<button type="button" class="search-toggle" id="search-toggle" aria-label="Mở tìm kiếm sản phẩm" aria-expanded="false" aria-controls="header-search-form">' +
+    '<span class="icon"><ion-icon name="search-outline"></ion-icon></span>' +
+    '<span class="text">Tìm kiếm</span>' +
+    '</button>' +
+    buildSearchForm() +
+    '</li>' +
     '<li class="list right-action" data-page="cart">' +
     '<a href="' + STORE_PATHS.cart + '" id="cart-toggle">' +
     '<span class="icon cart-icon-wrap">' +
@@ -236,6 +399,7 @@ function renderNav() {
   if (!nav) return;
 
   var activeKey = document.body.getAttribute("data-page") || "";
+  nav.classList.remove("search-open");
   nav.innerHTML = buildNav(activeKey);
   document.dispatchEvent(new CustomEvent("layout:updated"));
 
@@ -277,6 +441,7 @@ function loadSession() {
 document.addEventListener("DOMContentLoaded", function () {
   renderNav();
   renderFooter();
+  renderSupportWidget();
 
   loadSession().then(function () {
     renderNav();
