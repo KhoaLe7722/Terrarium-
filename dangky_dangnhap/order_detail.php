@@ -28,6 +28,24 @@ $statusClasses = [
     'da_huy' => 'status-da_huy',
 ];
 
+$statusLabels = [
+    'cho_xac_nhan' => 'Chờ xác nhận',
+    'dang_xu_ly' => 'Đang xử lý',
+    'dang_giao' => 'Đang giao',
+    'da_giao' => 'Đã giao',
+    'da_huy' => 'Đã hủy',
+];
+
+$paymentMethods = [
+    'cod' => 'Thanh toán khi nhận hàng (COD)',
+    'bank' => 'Chuyển khoản ngân hàng',
+    'momo' => 'Thanh toán qua MoMo',
+];
+
+$formatCurrency = static function (float|int|string $amount): string {
+    return number_format((float) $amount, 0, ',', '.') . 'đ';
+};
+
 $orderStmt = $conn->prepare("
     SELECT id, user_id, ho_ten_kh, email_kh, sdt_kh, dia_chi_giao, ghi_chu, tong_tien, trang_thai, ngay_dat, phuong_thuc_tt
     FROM orders
@@ -60,10 +78,11 @@ $displayEmail = trim((string) ($order['email_kh'] ?? '')) !== ''
     : $user['email'];
 $displayPhone = trim((string) ($order['sdt_kh'] ?? '')) !== ''
     ? $order['sdt_kh']
-    : ($user['so_dien_thoai'] ?: 'ChÆ°a cáº­p nháº­t');
+    : ($user['so_dien_thoai'] ?: 'Chưa cập nhật');
 $displayAddress = trim((string) ($order['dia_chi_giao'] ?? '')) !== ''
     ? $order['dia_chi_giao']
-    : ($user['dia_chi'] ?: 'ChÆ°a cáº­p nháº­t');
+    : ($user['dia_chi'] ?: 'Chưa cập nhật');
+
 $totalQuantity = 0;
 $tamTinh = 0.0;
 foreach ($items as $item) {
@@ -71,7 +90,8 @@ foreach ($items as $item) {
     $tamTinh += (float) ($item['thanh_tien'] ?? 0);
 }
 $phiVanChuyen = max(0, (float) $order['tong_tien'] - $tamTinh);
-
+$statusLabel = $statusLabels[(string) $order['trang_thai']] ?? 'Không xác định';
+$paymentMethodLabel = $paymentMethods[(string) ($order['phuong_thuc_tt'] ?? '')] ?? 'Chưa xác định';
 $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
 ?>
 <!DOCTYPE html>
@@ -81,7 +101,7 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="../images/avatar.png" type="image/png" />
-    <title>HÃ³a Ä‘Æ¡n Ä‘Æ¡n hÃ ng #<?= (int) $order['id'] ?> | Thuáº­n PhÃ¡t Garden</title>
+    <title>Hóa đơn đơn hàng #<?= (int) $order['id'] ?> | Thuận Phát Garden</title>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
@@ -89,7 +109,7 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
     <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
+    <link rel="stylesheet" href="../mainfont/main.css?v=20260329-4" />
     <link rel="stylesheet" href="ho_so.css?v=20260324-2" />
     <style>
         .order-detail-page {
@@ -338,7 +358,7 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
 
 <body data-page="profile">
     <nav class="navigation" id="main-nav"></nav>
-<script defer src="../mainfont/layout.js?v=20260329-4"></script>
+    <script defer src="../mainfont/layout.js?v=20260329-4"></script>
     <script defer src="../mainfont/main.js?v=20260329-2"></script>
 
     <main class="body__main">
@@ -346,47 +366,47 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
             <section class="detail-page-header">
                 <div class="detail-page-topline">
                     <div>
-                        <div class="detail-page-eyebrow">HÃ³a Ä‘Æ¡n Ä‘Æ¡n hÃ ng</div>
-                        <h1 class="detail-page-title">ÄÆ¡n hÃ ng #<?= (int) $order['id'] ?></h1>
+                        <div class="detail-page-eyebrow">Hóa đơn đơn hàng</div>
+                        <h1 class="detail-page-title">Đơn hàng #<?= (int) $order['id'] ?></h1>
                         <p class="detail-page-subtitle">
-                            Äáº·t lÃºc <?= date('d/m/Y H:i', strtotime($order['ngay_dat'])) ?>,
-                            phÆ°Æ¡ng thá»©c thanh toÃ¡n <?= htmlspecialchars(payment_method_label($order['phuong_thuc_tt'] ?? '')) ?>.
+                            Đặt lúc <?= date('d/m/Y H:i', strtotime($order['ngay_dat'])) ?>,
+                            phương thức thanh toán <?= htmlspecialchars($paymentMethodLabel) ?>.
                         </p>
                     </div>
                     <span class="order-status <?= htmlspecialchars($statusClasses[$order['trang_thai']] ?? '') ?>">
-                        <?= htmlspecialchars(order_status_label((string) $order['trang_thai'])) ?>
+                        <?= htmlspecialchars($statusLabel) ?>
                     </span>
                 </div>
 
                 <div class="detail-page-actions">
-                    <a class="profile-action secondary" href="ho_so.php">Quay láº¡i há»“ sÆ¡</a>
+                    <a class="profile-action secondary" href="ho_so.php">Quay lại hồ sơ</a>
                     <?php if ($canCancel): ?>
                         <button
                             type="button"
                             class="profile-action danger js-open-cancel-order"
                             data-order-id="<?= (int) $order['id'] ?>"
                             data-order-label="#<?= (int) $order['id'] ?>">
-                            Há»§y Ä‘Æ¡n hÃ ng
+                            Hủy đơn hàng
                         </button>
                     <?php endif; ?>
                 </div>
 
                 <div class="detail-highlight-row">
                     <div class="detail-highlight">
-                        <span class="detail-highlight__label">MÃ£ hÃ³a Ä‘Æ¡n</span>
+                        <span class="detail-highlight__label">Mã hóa đơn</span>
                         <div class="detail-highlight__value">HD-<?= str_pad((string) $order['id'], 6, '0', STR_PAD_LEFT) ?></div>
                     </div>
                     <div class="detail-highlight">
-                        <span class="detail-highlight__label">Tá»•ng sáº£n pháº©m</span>
+                        <span class="detail-highlight__label">Tổng sản phẩm</span>
                         <div class="detail-highlight__value"><?= (int) $totalQuantity ?></div>
                     </div>
                     <div class="detail-highlight">
-                        <span class="detail-highlight__label">Sá»‘ dÃ²ng hÃ ng</span>
+                        <span class="detail-highlight__label">Số dòng hàng</span>
                         <div class="detail-highlight__value"><?= count($items) ?></div>
                     </div>
                     <div class="detail-highlight">
-                        <span class="detail-highlight__label">Tá»•ng thanh toÃ¡n</span>
-                        <div class="detail-highlight__value"><?= htmlspecialchars(format_currency_vnd($order['tong_tien'])) ?></div>
+                        <span class="detail-highlight__label">Tổng thanh toán</span>
+                        <div class="detail-highlight__value"><?= htmlspecialchars($formatCurrency($order['tong_tien'])) ?></div>
                     </div>
                 </div>
             </section>
@@ -394,11 +414,11 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
             <section class="detail-grid">
                 <div>
                     <article class="detail-card">
-                        <h2 class="detail-card__title">Sáº£n pháº©m trong Ä‘Æ¡n</h2>
+                        <h2 class="detail-card__title">Sản phẩm trong đơn</h2>
 
                         <?php if (empty($items)): ?>
                             <div class="empty-state" style="padding: 24px 0 8px;">
-                                <p>ÄÆ¡n hÃ ng nÃ y chÆ°a cÃ³ sáº£n pháº©m.</p>
+                                <p>Đơn hàng này chưa có sản phẩm.</p>
                             </div>
                         <?php else: ?>
                             <div class="invoice-items">
@@ -412,13 +432,13 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
                                         <div>
                                             <div class="invoice-item__name"><?= htmlspecialchars($item['ten_sp']) ?></div>
                                             <div class="invoice-item__meta">
-                                                MÃ£ sáº£n pháº©m: #<?= (int) ($item['product_id'] ?? 0) ?><br>
-                                                ÄÆ¡n giÃ¡: <?= htmlspecialchars(format_currency_vnd($item['gia'])) ?><br>
-                                                Sá»‘ lÆ°á»£ng: <?= (int) ($item['so_luong'] ?? 0) ?>
+                                                Mã sản phẩm: #<?= (int) ($item['product_id'] ?? 0) ?><br>
+                                                Đơn giá: <?= htmlspecialchars($formatCurrency($item['gia'])) ?><br>
+                                                Số lượng: <?= (int) ($item['so_luong'] ?? 0) ?>
                                             </div>
                                         </div>
                                         <div class="invoice-item__subtotal">
-                                            <?= htmlspecialchars(format_currency_vnd($item['thanh_tien'])) ?>
+                                            <?= htmlspecialchars($formatCurrency($item['thanh_tien'])) ?>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -426,24 +446,24 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
 
                             <div class="invoice-summary">
                                 <div class="invoice-summary__row">
-                                    <span>Tá»•ng sá»‘ lÆ°á»£ng</span>
-                                    <strong><?= (int) $totalQuantity ?> sáº£n pháº©m</strong>
+                                    <span>Tổng số lượng</span>
+                                    <strong><?= (int) $totalQuantity ?> sản phẩm</strong>
                                 </div>
                                 <div class="invoice-summary__row">
-                                    <span>Tá»•ng dÃ²ng hÃ ng</span>
-                                    <strong><?= count($items) ?> má»¥c</strong>
+                                    <span>Tổng dòng hàng</span>
+                                    <strong><?= count($items) ?> mục</strong>
                                 </div>
                                 <div class="invoice-summary__row">
                                     <span>Tạm tính</span>
-                                    <strong><?= htmlspecialchars(format_currency_vnd($tamTinh)) ?></strong>
+                                    <strong><?= htmlspecialchars($formatCurrency($tamTinh)) ?></strong>
                                 </div>
                                 <div class="invoice-summary__row">
                                     <span>Phí vận chuyển</span>
-                                    <strong><?= htmlspecialchars(format_currency_vnd($phiVanChuyen)) ?></strong>
+                                    <strong><?= htmlspecialchars($formatCurrency($phiVanChuyen)) ?></strong>
                                 </div>
                                 <div class="invoice-summary__row total">
-                                    <span>Tá»•ng thanh toÃ¡n</span>
-                                    <span><?= htmlspecialchars(format_currency_vnd($order['tong_tien'])) ?></span>
+                                    <span>Tổng thanh toán</span>
+                                    <span><?= htmlspecialchars($formatCurrency($order['tong_tien'])) ?></span>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -452,10 +472,10 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
 
                 <div>
                     <article class="detail-card">
-                        <h2 class="detail-card__title">ThÃ´ng tin nháº­n hÃ ng</h2>
+                        <h2 class="detail-card__title">Thông tin nhận hàng</h2>
                         <div class="detail-list">
                             <div class="detail-item">
-                                <span class="detail-item__label">NgÆ°á»i nháº­n</span>
+                                <span class="detail-item__label">Người nhận</span>
                                 <div class="detail-item__value"><?= htmlspecialchars($displayName) ?></div>
                             </div>
                             <div class="detail-item">
@@ -463,42 +483,42 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
                                 <div class="detail-item__value"><?= htmlspecialchars($displayEmail) ?></div>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-item__label">Sá»‘ Ä‘iá»‡n thoáº¡i</span>
+                                <span class="detail-item__label">Số điện thoại</span>
                                 <div class="detail-item__value"><?= htmlspecialchars($displayPhone) ?></div>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-item__label">Äá»‹a chá»‰ giao hÃ ng</span>
+                                <span class="detail-item__label">Địa chỉ giao hàng</span>
                                 <div class="detail-item__value"><?= nl2br(htmlspecialchars($displayAddress)) ?></div>
                             </div>
                         </div>
                     </article>
 
                     <article class="detail-card">
-                        <h2 class="detail-card__title">ThÃ´ng tin Ä‘Æ¡n hÃ ng</h2>
+                        <h2 class="detail-card__title">Thông tin đơn hàng</h2>
                         <div class="detail-list">
                             <div class="detail-item">
-                                <span class="detail-item__label">Tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng</span>
-                                <div class="detail-item__value"><?= htmlspecialchars(order_status_label((string) $order['trang_thai'])) ?></div>
+                                <span class="detail-item__label">Trạng thái đơn hàng</span>
+                                <div class="detail-item__value"><?= htmlspecialchars($statusLabel) ?></div>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-item__label">PhÆ°Æ¡ng thá»©c thanh toÃ¡n</span>
-                                <div class="detail-item__value"><?= htmlspecialchars(payment_method_label($order['phuong_thuc_tt'] ?? '')) ?></div>
+                                <span class="detail-item__label">Phương thức thanh toán</span>
+                                <div class="detail-item__value"><?= htmlspecialchars($paymentMethodLabel) ?></div>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-item__label">Thá»i gian Ä‘áº·t</span>
+                                <span class="detail-item__label">Thời gian đặt</span>
                                 <div class="detail-item__value"><?= date('d/m/Y H:i', strtotime($order['ngay_dat'])) ?></div>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-item__label">Ghi chÃº cá»§a khÃ¡ch</span>
+                                <span class="detail-item__label">Ghi chú của khách</span>
                                 <div class="detail-item__value">
-                                    <?= trim((string) ($order['ghi_chu'] ?? '')) !== '' ? nl2br(htmlspecialchars($order['ghi_chu'])) : 'KhÃ´ng cÃ³ ghi chÃº.' ?>
+                                    <?= trim((string) ($order['ghi_chu'] ?? '')) !== '' ? nl2br(htmlspecialchars($order['ghi_chu'])) : 'Không có ghi chú.' ?>
                                 </div>
                             </div>
                         </div>
 
                         <?php if ($canCancel): ?>
                             <div class="note-box">
-                                ÄÆ¡n hÃ ng nÃ y Ä‘ang á»Ÿ tráº¡ng thÃ¡i cÃ³ thá»ƒ há»§y. Khi báº¡n xÃ¡c nháº­n há»§y Ä‘Æ¡n, sá»‘ lÆ°á»£ng sáº£n pháº©m sáº½ Ä‘Æ°á»£c hoÃ n tráº£ láº¡i kho.
+                                Đơn hàng này đang ở trạng thái có thể hủy. Khi bạn xác nhận hủy đơn, số lượng sản phẩm sẽ được hoàn trả lại kho.
                             </div>
                         <?php endif; ?>
                     </article>
@@ -509,11 +529,11 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
 
     <div class="confirm-modal" id="cancel-order-modal">
         <div class="confirm-modal__panel">
-            <h3 class="confirm-modal__title">Há»§y Ä‘Æ¡n hÃ ng</h3>
-            <p class="confirm-modal__message" data-cancel-order-message>Báº¡n cÃ³ muá»‘n há»§y Ä‘Æ¡n hÃ ng nÃ y khÃ´ng?</p>
+            <h3 class="confirm-modal__title">Hủy đơn hàng</h3>
+            <p class="confirm-modal__message" data-cancel-order-message>Bạn có muốn hủy đơn hàng này không?</p>
             <div class="confirm-modal__actions">
-                <button type="button" class="confirm-btn secondary" data-cancel-order-close>KHÃ”NG</button>
-                <button type="button" class="confirm-btn danger" data-confirm-cancel-order>CÃ“</button>
+                <button type="button" class="confirm-btn secondary" data-cancel-order-close>KHÔNG</button>
+                <button type="button" class="confirm-btn danger" data-confirm-cancel-order>CÓ</button>
             </div>
         </div>
     </div>
@@ -524,4 +544,3 @@ $canCancel = order_can_customer_cancel((string) $order['trang_thai']);
 </body>
 
 </html>
-
